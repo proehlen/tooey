@@ -23,6 +23,9 @@ export type ListData = Array<Array<string>>
 export type OnSelectCallback = () => Promise<void>
 export type OnEnterCallback = (number) => Promise<void>
 
+/**
+ * A multi-column List component with optional row selection
+ */
 export default class List extends ComponentBase {
   _app: App
   _startIndex: number
@@ -41,10 +44,10 @@ export default class List extends ComponentBase {
    * @param {Array<ListColumn>} columns Columns to show in list
    * @param {ListData} data Data to show in list
    * @param {boolean} showHeadings Show column headings?
-   * @param {Menu} menu Menu to add paging options to
+   * @param {Menu} [menu=undefined] Menu to add paging options to
    * @param {boolean} rowSelection Allow row selection with arrow keys
-   * @param {OnSelectCallback} onSelect Function to call on row selection change
-   * @param {OnEnterCallback} onEnter Function to call when user presses Enter on row
+   * @param {OnSelectCallback} [onSelect=undefined] Function to call on row selection change
+   * @param {OnEnterCallback} [onEnter=undefined] Function to call when user presses Enter on row
    */
   constructor(
     app: App,
@@ -78,12 +81,19 @@ export default class List extends ComponentBase {
     }
   }
 
+  /**
+   * Updates the data shown in the list
+   * @param {ListData} data New data to be displayed in list
+   */
   setData(data: ListData) {
     this._data = data;
     this._startIndex = 0;
     this._selectedPageRow = 0;
   }
 
+  /**
+   * Renders this component
+   */
   render() {
     // Column headings
     if (this._showHeadings) {
@@ -116,6 +126,9 @@ export default class List extends ComponentBase {
       });
   }
 
+  /**
+   * Changes the currently displayed data to the previous page
+   */
   async pageUp() {
     if (this._startIndex === 0) {
       this._app.setInfo('Already at start');
@@ -132,6 +145,9 @@ export default class List extends ComponentBase {
     }
   }
 
+  /**
+   * Return the index of the currently selected row
+   */
   get selectedRowIndex() {
     return this._startIndex + this._selectedPageRow;
   }
@@ -148,6 +164,9 @@ export default class List extends ComponentBase {
     return this._currentPage() >= this._numberPages();
   }
 
+  /**
+   * Changes the currently displayed data to the next page
+   */
   async pageDown() {
     if ((this._startIndex + output.contentHeight) > this._data.length) {
       this._app.setInfo('No more pages');
@@ -163,6 +182,9 @@ export default class List extends ComponentBase {
     }
   }
 
+  /**
+   * Selects the previous record (pages up if necessary)
+   */
   async selectPrevious() {
     if (this._selectedPageRow === 0) {
       await this.pageUp();
@@ -174,6 +196,9 @@ export default class List extends ComponentBase {
     }
   }
 
+  /**
+   * Selects the next record (pages down if necessary)
+   */
   async selectNext() {
     const isLastPage = this._isLastPage();
     const lastPageRowIndex = (this._data.length % output.contentHeight) - 1;
@@ -191,6 +216,10 @@ export default class List extends ComponentBase {
     }
   }
 
+  /**
+   * Handle user input
+   * @param {string} key utf string representing key entered
+   */
   async handle(key: string) {
     switch (key) {
       case KEY_ENTER:
