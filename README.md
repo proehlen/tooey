@@ -38,7 +38,7 @@ Note: this component does not / cannot handle key strokes
 
 #### Parameters
 
--   `helpText` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)?** Extended or custom help text to be displayed (optional, default `DEFAULT_TEXT`)
+-   `helpText` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)**  (optional, default `DEFAULT_TEXT`)
 
 #### render
 
@@ -50,7 +50,9 @@ Handle user input (throws error)
 
 ##### Parameters
 
--   `key` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** key stroke
+-   `key` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** 
+
+Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)&lt;void>** 
 
 ### List
 
@@ -60,14 +62,14 @@ A multi-column List component with optional row selection
 
 #### Parameters
 
--   `app` **App** Instance of application for status messages
--   `columns` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;ListColumn>** Columns to show in list
--   `data` **ListData** Data to show in list
--   `showHeadings` **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** Show column headings? (optional, default `true`)
--   `menu` **Menu** Menu to add paging options to (optional, default `undefined`)
--   `rowSelection` **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** Allow row selection with arrow keys (optional, default `false`)
--   `onSelect` **OnSelectCallback** Function to call on row selection change (optional, default `undefined`)
--   `onEnter` **OnEnterCallback** Function to call when user presses Enter on row (optional, default `undefined`)
+-   `app` **App** 
+-   `columns` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;ListColumn>** 
+-   `data` **ListData** 
+-   `showHeadings` **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**  (optional, default `true`)
+-   `menu` **Menu** 
+-   `rowSelection` **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**  (optional, default `false`)
+-   `onSelect` **OnSelectCallback** 
+-   `onEnter` **OnEnterCallback** 
 
 #### setData
 
@@ -75,7 +77,7 @@ Updates the data shown in the list
 
 ##### Parameters
 
--   `data` **ListData** New data to be displayed in list
+-   `data` **ListData** 
 
 #### render
 
@@ -85,21 +87,31 @@ Renders this component
 
 Changes the currently displayed data to the previous page
 
+Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)&lt;void>** 
+
 #### selectedRowIndex
 
 Return the index of the currently selected row
+
+Returns **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** 
 
 #### pageDown
 
 Changes the currently displayed data to the next page
 
+Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)&lt;void>** 
+
 #### selectPrevious
 
 Selects the previous record (pages up if necessary)
 
+Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)&lt;void>** 
+
 #### selectNext
 
 Selects the next record (pages down if necessary)
+
+Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)&lt;void>** 
 
 #### handle
 
@@ -107,4 +119,6 @@ Handle user input
 
 ##### Parameters
 
--   `key` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** utf string representing key entered
+-   `key` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** 
+
+Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)&lt;void>** 

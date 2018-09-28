@@ -15,8 +15,6 @@ export default class InputHelp extends ComponentBase {
 
   /**
    * InputHelp constructor
-   * @constructor
-   * @param {string} [helpText] Extended or custom help text to be displayed
    */
   constructor(helpText: string = DEFAULT_TEXT) {
     super();
@@ -33,9 +31,8 @@ export default class InputHelp extends ComponentBase {
 
   /**
    * Handle user input (throws error)
-   * @param {string} key key stroke
    */
-  async handle(key: string) {
+  async handle(key: string): Promise<void> {
     throw new Error(`Input help cannot handle input (key: ${key}).`);
   }
 }

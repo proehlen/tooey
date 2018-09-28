@@ -39,15 +39,6 @@ export default class List extends ComponentBase {
 
   /**
    * List constructor
-   *
-   * @param {App} app Instance of application for status messages
-   * @param {Array<ListColumn>} columns Columns to show in list
-   * @param {ListData} data Data to show in list
-   * @param {boolean} showHeadings Show column headings?
-   * @param {Menu} [menu=undefined] Menu to add paging options to
-   * @param {boolean} rowSelection Allow row selection with arrow keys
-   * @param {OnSelectCallback} [onSelect=undefined] Function to call on row selection change
-   * @param {OnEnterCallback} [onEnter=undefined] Function to call when user presses Enter on row
    */
   constructor(
     app: App,
@@ -83,7 +74,6 @@ export default class List extends ComponentBase {
 
   /**
    * Updates the data shown in the list
-   * @param {ListData} data New data to be displayed in list
    */
   setData(data: ListData) {
     this._data = data;
@@ -129,7 +119,7 @@ export default class List extends ComponentBase {
   /**
    * Changes the currently displayed data to the previous page
    */
-  async pageUp() {
+  async pageUp(): Promise<void> {
     if (this._startIndex === 0) {
       this._app.setInfo('Already at start');
       return;
@@ -148,7 +138,7 @@ export default class List extends ComponentBase {
   /**
    * Return the index of the currently selected row
    */
-  get selectedRowIndex() {
+  get selectedRowIndex(): number {
     return this._startIndex + this._selectedPageRow;
   }
 
@@ -167,7 +157,7 @@ export default class List extends ComponentBase {
   /**
    * Changes the currently displayed data to the next page
    */
-  async pageDown() {
+  async pageDown(): Promise<void> {
     if ((this._startIndex + output.contentHeight) > this._data.length) {
       this._app.setInfo('No more pages');
       return;
@@ -185,7 +175,7 @@ export default class List extends ComponentBase {
   /**
    * Selects the previous record (pages up if necessary)
    */
-  async selectPrevious() {
+  async selectPrevious(): Promise<void> {
     if (this._selectedPageRow === 0) {
       await this.pageUp();
     } else {
@@ -199,7 +189,7 @@ export default class List extends ComponentBase {
   /**
    * Selects the next record (pages down if necessary)
    */
-  async selectNext() {
+  async selectNext(): Promise<void> {
     const isLastPage = this._isLastPage();
     const lastPageRowIndex = (this._data.length % output.contentHeight) - 1;
     if (!isLastPage && this._selectedPageRow >= output.contentHeight - 1) {
@@ -218,9 +208,8 @@ export default class List extends ComponentBase {
 
   /**
    * Handle user input
-   * @param {string} key utf string representing key entered
    */
-  async handle(key: string) {
+  async handle(key: string): Promise<void> {
     switch (key) {
       case KEY_ENTER:
         if (this._onEnter) {
