@@ -20,6 +20,9 @@ export type ListColumn = {
 
 export type ListData = Array<Array<string>>
 
+export type OnSelectCallback = () => Promise<void>
+export type OnEnterCallback = (number) => Promise<void>
+
 export default class List extends ComponentBase {
   _app: App
   _startIndex: number
@@ -27,10 +30,22 @@ export default class List extends ComponentBase {
   _columns: Array<ListColumn>
   _showHeadings: boolean
   _rowSelection: boolean
-  _onEnter: (number) => Promise<void>
-  _onSelect: () => Promise<void>
+  _onSelect: OnSelectCallback
+  _onEnter: OnEnterCallback
   _selectedPageRow: number
 
+  /**
+   * List constructor
+   *
+   * @param {App} app Instance of application for status messages
+   * @param {Array<ListColumn>} columns Columns to show in list
+   * @param {ListData} data Data to show in list
+   * @param {boolean} showHeadings Show column headings?
+   * @param {Menu} menu Menu to add paging options to
+   * @param {boolean} rowSelection Allow row selection with arrow keys
+   * @param {OnSelectCallback} onSelect Function to call on row selection change
+   * @param {OnEnterCallback} onEnter Function to call when user presses Enter on row
+   */
   constructor(
     app: App,
     columns: Array<ListColumn>,
@@ -38,8 +53,8 @@ export default class List extends ComponentBase {
     showHeadings: boolean = true,
     menu?: Menu,
     rowSelection: boolean = false,
-    onSelect?: () => Promise<void>,
-    onEnter?: (number) => Promise<void>,
+    onSelect?: OnSelectCallback,
+    onEnter?: OnEnterCallback,
   ) {
     super();
     this._app = app;
@@ -47,14 +62,14 @@ export default class List extends ComponentBase {
     this.setData(data);
     this._showHeadings = showHeadings;
     this._rowSelection = rowSelection;
-    if (onEnter) {
-      this._onEnter = onEnter;
-    }
     if (onSelect) {
       if (!rowSelection) {
         throw new Error('onSelect callback is incompatible with rowSelection === false');
       }
       this._onSelect = onSelect;
+    }
+    if (onEnter) {
+      this._onEnter = onEnter;
     }
     if (menu) {
       // Add paging to menu
