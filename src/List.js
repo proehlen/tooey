@@ -18,10 +18,12 @@ export type ListColumn = {
   width: number,
 }
 
+export type ListData = Array<Array<string>>
+
 export default class List extends ComponentBase {
   _app: App
   _startIndex: number
-  _data: Array<Array<string>>
+  _data: ListData
   _columns: Array<ListColumn>
   _showHeadings: boolean
   _rowSelection: boolean
@@ -32,7 +34,7 @@ export default class List extends ComponentBase {
   constructor(
     app: App,
     columns: Array<ListColumn>,
-    data: Array<Array<string>>,
+    data: ListData,
     showHeadings: boolean = true,
     menu?: Menu,
     rowSelection: boolean = false,
@@ -61,7 +63,7 @@ export default class List extends ComponentBase {
     }
   }
 
-  setData(data: Array<Array<string>>) {
+  setData(data: ListData) {
     this._data = data;
     this._startIndex = 0;
     this._selectedPageRow = 0;
