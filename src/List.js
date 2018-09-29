@@ -1,4 +1,5 @@
 // @flow
+
 import colors from 'colors';
 import { rightPad } from 'stringfu';
 
@@ -14,73 +15,61 @@ import {
 } from './keys';
 
 /**
- * A column to be displayed in the list
+ * A column to be displayed in the list.  The value function
+ * recieves a row in the data (an object) and the row index
+ * and returns the value to be output as a string in that
+ * column.
  */
-export type ListColumn = {
+export type ListColumn<T> = {
   heading: string,
   width: number,
+  value: (T, number) => string,
 }
 
-/**
- * A row that is displayed in the list.  Either your data should
- * be an Array of this type - ie an Array<Array<string>> or
- * you should provide a DataMapper function to transform your
- * raw data into this format
- */
-export type OutputRow = Array<string>
+type OutputRow = Array<string>
 
 /**
- * Raw list data.  It should either be an array of OutputRow or
- * you should provide a DataMapper function to transform it
- * at render time.
+ * Data to display in the list - an array of objects.
  */
-export type ListData = Array<any>
+export type ListData<T> = Array<T>
 
 /**
  * Callback function to be called when the user navigates to
  * a different row in the list (ie via up/down arrows).  Requires
  * List to be constructed with rowSelection === true.
  */
-export type OnSelectCallback = () => Promise<void>
+export type ListOnSelect = () => Promise<void>
 
 /**
  * Callback function to be called when the user presses Enter
  * on a list row.
  */
-export type OnEnterCallback = (number) => Promise<void>
-
-/**
- * Function that is called to transform each row of raw data
- * into a an array of strings
- */
-export type DataMapper = (any, number, Array<any>) => OutputRow
+export type ListOnEnter = (number) => Promise<void>
 
 /**
  * List options
  */
 export type ListOptions = {
-  dataMapper?: DataMapper,
   showHeadings?: boolean,
   menu?: Menu,
   rowSelection?: boolean,
-  onSelect?: OnSelectCallback,
-  onEnter?: OnEnterCallback,
+  onSelect?: ListOnSelect,
+  onEnter?: ListOnEnter,
 }
 
 
 /**
  * A multi-column List component with optional row selection
  */
-export default class List extends ComponentBase {
+export default class List<T> extends ComponentBase {
   _app: App
   _startIndex: number
-  _data: ListData
-  _columns: Array<ListColumn>
-  _dataMapper: DataMapper
+  _data: ListData<T>
+  _columns: Array<ListColumn<T>>
   _showHeadings: boolean
   _rowSelection: boolean
-  _onSelect: OnSelectCallback
-  _onEnter: OnEnterCallback
+  _onSelect: ListOnSelect
+  _onEnter: ListOnEnter
   _selectedPageRow: number
 
   /**
@@ -88,17 +77,14 @@ export default class List extends ComponentBase {
    */
   constructor(
     app: App,
-    columns: Array<ListColumn>,
-    data: ListData,
+    columns: Array<ListColumn<T>>,
+    data: ListData<T>,
     options: ListOptions,
   ) {
     super();
     this._app = app;
     this._columns = columns;
     this.setData(data);
-    if (options.dataMapper) {
-      this._dataMapper = options.dataMapper;
-    }
     this._showHeadings = options.showHeadings === undefined ? true : options.showHeadings;
     this._rowSelection = options.rowSelection === undefined ? false : options.rowSelection;
     if (options.onSelect) {
@@ -123,10 +109,19 @@ export default class List extends ComponentBase {
   /**
    * Updates the data shown in the list
    */
-  setData(data: ListData) {
+  setData(data: ListData<T>) {
     this._data = data;
     this._startIndex = 0;
     this._selectedPageRow = 0;
+  }
+
+  _getValues(object: T, index: number): OutputRow {
+    const result = [];
+    for (let i = 0; i < this._columns.length; i++) {
+      const column = this._columns[i];
+      result.push(column.value(object, index));
+    }
+    return result;
   }
 
   /**
@@ -145,17 +140,15 @@ export default class List extends ComponentBase {
     }
 
     // Data for current page
-    const data = this._dataMapper
-      ? this._data.map(this._dataMapper)
-      : this._data;
     output.cursorTo(0, output.contentStartRow);
     const reduceColsToString = (accumulator, colData, index): string => {
       const column = this._columns[index];
       const colText = rightPad(colData, column.width);
       return `${accumulator || ''}${colText} `;
     };
-    data
+    this._data
       .slice(this._startIndex, this._startIndex + output.contentHeight)
+      .map(this._getValues.bind(this))
       .map(cols => cols.reduce(reduceColsToString, ''))
       .forEach((text, index) => {
         const outputText = text.substr(0, output.width);

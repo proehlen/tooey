@@ -28,7 +28,6 @@
     "build": "npm run eslint && npm run clean && npm run flowbuild && babel src -d lib",
     "clean": "rimraf lib",
     "docs": "documentation readme src --section=API",
-    "postdocs": "git add README.md",
     "eslint": "eslint src",
     "flow": "flow",
     "flowbuild": "flow-copy-source src lib",
