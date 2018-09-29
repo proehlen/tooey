@@ -15,6 +15,15 @@ Tooey (pronounced "too-ee") is a library and framework for creating [text-based 
     -   [render](#render)
     -   [handle](#handle)
         -   [Parameters](#parameters-1)
+-   [ListColumn](#listcolumn)
+    -   [Properties](#properties)
+-   [OutputRow](#outputrow)
+-   [ListData](#listdata)
+-   [OnSelectCallback](#onselectcallback)
+-   [OnEnterCallback](#onentercallback)
+-   [DataMapper](#datamapper)
+-   [ListOptions](#listoptions)
+    -   [Properties](#properties-1)
 -   [List](#list)
     -   [Parameters](#parameters-2)
     -   [setData](#setdata)
@@ -54,6 +63,71 @@ Handle user input (throws error)
 
 Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)&lt;void>** 
 
+### ListColumn
+
+A column to be displayed in the list
+
+Type: {heading: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String), width: [number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)}
+
+#### Properties
+
+-   `heading` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** 
+-   `width` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** 
+
+### OutputRow
+
+A row that is displayed in the list.  Either your data should
+be an Array of this type - ie an Array&lt;Array<string>> or
+you should provide a DataMapper function to transform your
+raw data into this format
+
+Type: [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>
+
+### ListData
+
+Raw list data.  It should either be an array of OutputRow or
+you should provide a DataMapper function to transform it
+at render time.
+
+Type: [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;any>
+
+### OnSelectCallback
+
+Callback function to be called when the user navigates to
+a different row in the list (ie via up/down arrows).  Requires
+List to be constructed with rowSelection === true.
+
+Type: function (): [Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)&lt;void>
+
+### OnEnterCallback
+
+Callback function to be called when the user presses Enter
+on a list row.
+
+Type: function ([number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)): [Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)&lt;void>
+
+### DataMapper
+
+Function that is called to transform each row of raw data
+into a an array of strings
+
+Type: function (any, [number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number), [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;any>): [OutputRow](#outputrow)
+
+### ListOptions
+
+List options
+
+Type: {dataMapper: [DataMapper](#datamapper)?, showHeadings: [boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)?, menu: Menu?, rowSelection: [boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)?, onSelect: [OnSelectCallback](#onselectcallback)?, onEnter: [OnEnterCallback](#onentercallback)?}
+
+#### Properties
+
+-   `dataMapper` **[DataMapper](#datamapper)?** 
+-   `showHeadings` **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)?** 
+-   `menu` **Menu?** 
+-   `rowSelection` **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)?** 
+-   `onSelect` **[OnSelectCallback](#onselectcallback)?** 
+-   `onEnter` **[OnEnterCallback](#onentercallback)?** 
+
 ### List
 
 **Extends ComponentBase**
@@ -63,13 +137,9 @@ A multi-column List component with optional row selection
 #### Parameters
 
 -   `app` **App** 
--   `columns` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;ListColumn>** 
--   `data` **ListData** 
--   `showHeadings` **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**  (optional, default `true`)
--   `menu` **Menu** 
--   `rowSelection` **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**  (optional, default `false`)
--   `onSelect` **OnSelectCallback** 
--   `onEnter` **OnEnterCallback** 
+-   `columns` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;[ListColumn](#listcolumn)>** 
+-   `data` **[ListData](#listdata)** 
+-   `options` **[ListOptions](#listoptions)** 
 
 #### setData
 
@@ -77,7 +147,7 @@ Updates the data shown in the list
 
 ##### Parameters
 
--   `data` **ListData** 
+-   `data` **[ListData](#listdata)** 
 
 #### render
 

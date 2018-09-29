@@ -13,17 +13,51 @@ import {
   KEY_PAGE_DOWN, KEY_PAGE_UP, KEY_DOWN, KEY_UP, KEY_ENTER,
 } from './keys';
 
+/**
+ * A column to be displayed in the list
+ */
 export type ListColumn = {
   heading: string,
   width: number,
 }
 
+/**
+ * A row that is displayed in the list.  Either your data should
+ * be an Array of this type - ie an Array<Array<string>> or
+ * you should provide a DataMapper function to transform your
+ * raw data into this format
+ */
 export type OutputRow = Array<string>
+
+/**
+ * Raw list data.  It should either be an array of OutputRow or
+ * you should provide a DataMapper function to transform it
+ * at render time.
+ */
 export type ListData = Array<any>
+
+/**
+ * Callback function to be called when the user navigates to
+ * a different row in the list (ie via up/down arrows).  Requires
+ * List to be constructed with rowSelection === true.
+ */
 export type OnSelectCallback = () => Promise<void>
+
+/**
+ * Callback function to be called when the user presses Enter
+ * on a list row.
+ */
 export type OnEnterCallback = (number) => Promise<void>
+
+/**
+ * Function that is called to transform each row of raw data
+ * into a an array of strings
+ */
 export type DataMapper = (any, number, Array<any>) => OutputRow
 
+/**
+ * List options
+ */
 export type ListOptions = {
   dataMapper?: DataMapper,
   showHeadings?: boolean,
