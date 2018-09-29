@@ -18,10 +18,21 @@ export type ListColumn = {
   width: number,
 }
 
-export type ListData = Array<Array<string>>
-
+export type OutputRow = Array<string>
+export type ListData = Array<any>
 export type OnSelectCallback = () => Promise<void>
 export type OnEnterCallback = (number) => Promise<void>
+export type DataMapper = (any, number, Array<any>) => OutputRow
+
+export type ListOptions = {
+  dataMapper?: DataMapper,
+  showHeadings?: boolean,
+  menu?: Menu,
+  rowSelection?: boolean,
+  onSelect?: OnSelectCallback,
+  onEnter?: OnEnterCallback,
+}
+
 
 /**
  * A multi-column List component with optional row selection
@@ -31,6 +42,7 @@ export default class List extends ComponentBase {
   _startIndex: number
   _data: ListData
   _columns: Array<ListColumn>
+  _dataMapper: DataMapper
   _showHeadings: boolean
   _rowSelection: boolean
   _onSelect: OnSelectCallback
@@ -44,31 +56,33 @@ export default class List extends ComponentBase {
     app: App,
     columns: Array<ListColumn>,
     data: ListData,
-    showHeadings: boolean = true,
-    menu?: Menu,
-    rowSelection: boolean = false,
-    onSelect?: OnSelectCallback,
-    onEnter?: OnEnterCallback,
+    options: ListOptions,
   ) {
     super();
     this._app = app;
     this._columns = columns;
     this.setData(data);
-    this._showHeadings = showHeadings;
-    this._rowSelection = rowSelection;
-    if (onSelect) {
-      if (!rowSelection) {
+    if (options.dataMapper) {
+      this._dataMapper = options.dataMapper;
+    }
+    this._showHeadings = options.showHeadings === undefined ? true : options.showHeadings;
+    this._rowSelection = options.rowSelection === undefined ? false : options.rowSelection;
+    if (options.onSelect) {
+      if (!this._rowSelection) {
         throw new Error('onSelect callback is incompatible with rowSelection === false');
       }
-      this._onSelect = onSelect;
+      this._onSelect = options.onSelect;
     }
-    if (onEnter) {
-      this._onEnter = onEnter;
+    if (options.onEnter) {
+      this._onEnter = options.onEnter;
     }
-    if (menu) {
+    if (options.menu) {
       // Add paging to menu
-      menu.addOption(new MenuOption('D', 'Page Down', 'Go to next page', this.pageDown.bind(this)));
-      menu.addOption(new MenuOption('U', 'Page Up', 'Return to previous page', this.pageUp.bind(this)));
+      options.menu.addOption(new MenuOption('D', 'Page Down', 'Go to next page', this.pageDown.bind(this)));
+    }
+    if (options.menu) {
+      // Add paging to menu (incorrect flow error requires section if statement)
+      options.menu.addOption(new MenuOption('U', 'Page Up', 'Return to previous page', this.pageUp.bind(this)));
     }
   }
 
@@ -97,13 +111,16 @@ export default class List extends ComponentBase {
     }
 
     // Data for current page
+    const data = this._dataMapper
+      ? this._data.map(this._dataMapper)
+      : this._data;
     output.cursorTo(0, output.contentStartRow);
     const reduceColsToString = (accumulator, colData, index): string => {
       const column = this._columns[index];
       const colText = rightPad(colData, column.width);
       return `${accumulator || ''}${colText} `;
     };
-    this._data
+    data
       .slice(this._startIndex, this._startIndex + output.contentHeight)
       .map(cols => cols.reduce(reduceColsToString, ''))
       .forEach((text, index) => {
