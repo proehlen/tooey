@@ -79,7 +79,7 @@ export default class List<T> extends ComponentBase {
     app: App,
     columns: Array<ListColumn<T>>,
     data: ListData<T>,
-    options: ListOptions,
+    options: ListOptions = {},
   ) {
     super();
     this._app = app;
