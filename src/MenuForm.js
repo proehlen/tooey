@@ -10,12 +10,21 @@ import {
   KEY_UP, KEY_DOWN,
 } from './keys';
 
+export type MenuFormOptions = {
+  readOnly?: boolean
+}
+
 export default class MenuForm extends ComponentBase {
   _menu: Menu
   _form: Form
   _activeComponent: ComponentBase
 
-  constructor(app: App, fields: Array<FormFieldDescription>, MenuItems: Array<MenuItem>) {
+  constructor(
+    app: App,
+    fields: Array<FormFieldDescription>,
+    menuItems: Array<MenuItem>,
+    options: MenuFormOptions = {},
+  ) {
     super();
 
     // Create form
@@ -24,11 +33,12 @@ export default class MenuForm extends ComponentBase {
       fields, {
         onNoMoreFields: this.onNoMoreFields.bind(this),
         onEscape: this.onEscapeFromField.bind(this),
+        readOnly: options.readOnly,
       },
     );
 
     // Create menu
-    this._menu = new Menu(app, MenuItems, true, this.onNoMoreOptions.bind(this));
+    this._menu = new Menu(app, menuItems, true, this.onNoMoreOptions.bind(this));
 
     // Start with menu active
     this._activeComponent = this._menu;
