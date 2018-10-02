@@ -2,9 +2,9 @@
 
 import App from './App';
 import ComponentBase from './ComponentBase';
-import Form, { type FieldData } from './Form';
+import Form, { type FormFieldDescription } from './Form';
 import Menu from './Menu';
-import MenuOption from './MenuOption';
+import MenuItem from './MenuItem';
 
 import {
   KEY_UP, KEY_DOWN,
@@ -15,19 +15,20 @@ export default class MenuForm extends ComponentBase {
   _form: Form
   _activeComponent: ComponentBase
 
-  constructor(app: App, fields: Array<FieldData>, menuOptions: Array<MenuOption>) {
+  constructor(app: App, fields: Array<FormFieldDescription>, MenuItems: Array<MenuItem>) {
     super();
 
     // Create form
     this._form = new Form(
       app,
-      fields,
-      this.onNoMoreFields.bind(this),
-      this.onEscapeFromField.bind(this),
+      fields, {
+        onNoMoreFields: this.onNoMoreFields.bind(this),
+        onEscape: this.onEscapeFromField.bind(this),
+      },
     );
 
     // Create menu
-    this._menu = new Menu(app, menuOptions, true, this.onNoMoreOptions.bind(this));
+    this._menu = new Menu(app, MenuItems, true, this.onNoMoreOptions.bind(this));
 
     // Start with menu active
     this._activeComponent = this._menu;
@@ -49,9 +50,9 @@ export default class MenuForm extends ComponentBase {
   async onNoMoreFields(direction: number) {
     this._activeComponent = this._menu;
     if (direction > 0) {
-      this._menu.setFirstOptionSelected();
+      this._menu.setFirstItemSelected();
     } else {
-      this._menu.setLastOptionSelected();
+      this._menu.setLastItemSelected();
     }
   }
 

@@ -1,6 +1,6 @@
 // @flow
 
-export default class MenuOption {
+export default class MenuItem {
   _label: string
   _key: string
   _keyPosition: number

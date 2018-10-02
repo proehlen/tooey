@@ -9,44 +9,49 @@ import {
   KEY_TAB, KEY_SHIFT_TAB, KEY_LEFT, KEY_RIGHT, KEY_ESCAPE, KEY_UP, KEY_DOWN, KEY_ENTER,
 } from './keys';
 
-export type FieldData = {
+type FormSelectionDirection = -1 | 1
+type FormOnNoMoreFields = (FormSelectionDirection) => Promise<void>
+type FormOnEscape = () => Promise<void>
+
+export type FormOptions = {
+  readOnly?: boolean,
+  onNoMoreFields?: FormOnNoMoreFields,
+  onEscape?: FormOnEscape,
+}
+
+export type FormFieldDescription = {
   label: string,
   default: string,
   type: InputType,
 }
 
-export type Field = {
+export type FormField = {
   label: string,
   input: Input,
 }
 
-type Direction = -1 | 1
-type NoMoreFieldsCallback = (Direction) => Promise<void>
-type EscapeCallback = () => Promise<void>
-
 export default class Form extends ComponentBase {
-  _fields: Array<Field>
+  _app: App
+  _fields: Array<FormField>
   _selectedFieldIndex: number | void
-  _onNoMoreFields: NoMoreFieldsCallback
-  _onEscape: EscapeCallback
+  _readOnly: ?boolean
+  _onNoMoreFields: ?FormOnNoMoreFields
+  _onEscape: ?FormOnEscape
 
   constructor(
     app: App,
-    fields: Array<FieldData>,
-    onNoMoreFields?: NoMoreFieldsCallback,
-    onEscape?: EscapeCallback,
+    fields: Array<FormFieldDescription>,
+    options: FormOptions = {},
   ) {
     super();
+    this._app = app;
     this._fields = fields.map(data => ({
       label: data.label,
       input: new Input(app, this._onEnter.bind(this), data.default, data.type),
     }));
-    if (onNoMoreFields) {
-      this._onNoMoreFields = onNoMoreFields;
-    }
-    if (onEscape) {
-      this._onEscape = onEscape;
-    }
+    this._readOnly = options.readOnly;
+    this._onNoMoreFields = options.onNoMoreFields;
+    this._onEscape = options.onEscape;
   }
 
   async _onEnter() {
@@ -73,7 +78,7 @@ export default class Form extends ComponentBase {
     this._selectedFieldIndex = this._fields.length - 1;
   }
 
-  cycleSelectedField(direction: 1 | -1) {
+  cycleSelectedField(direction: FormSelectionDirection) {
     if (this._selectedFieldIndex === undefined) {
       // No current field selected
       if (direction === 1) {
@@ -119,7 +124,11 @@ export default class Form extends ComponentBase {
         break;
       default:
         if (this.selectedField) {
-          await this.selectedField.input.handle(key);
+          if (this._readOnly) {
+            this._app.setWarning('This form is not editable.');
+          } else {
+            await this.selectedField.input.handle(key);
+          }
         }
         break;
     }
