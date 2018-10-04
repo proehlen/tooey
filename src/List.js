@@ -7,7 +7,7 @@ import { rightPad } from 'stringfu';
 import App from './App';
 import ComponentBase from './ComponentBase';
 import Menu from './Menu';
-import MenuOption from './MenuOption';
+import MenuItem from './MenuItem';
 import output from './output';
 
 import {
@@ -98,11 +98,11 @@ export default class List<T> extends ComponentBase {
     }
     if (options.menu) {
       // Add paging to menu
-      options.menu.addOption(new MenuOption('D', 'Page Down', 'Go to next page', this.pageDown.bind(this)));
+      options.menu.addItem(new MenuItem('D', 'Page Down', 'Go to next page', this.pageDown.bind(this)));
     }
     if (options.menu) {
       // Add paging to menu (incorrect flow error requires section if statement)
-      options.menu.addOption(new MenuOption('U', 'Page Up', 'Return to previous page', this.pageUp.bind(this)));
+      options.menu.addItem(new MenuItem('U', 'Page Up', 'Return to previous page', this.pageUp.bind(this)));
     }
   }
 

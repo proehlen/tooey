@@ -7,7 +7,7 @@ import keys from './keys';
 import List from './List';
 import Menu from './Menu';
 import MenuForm from './MenuForm';
-import MenuOption from './MenuOption';
+import MenuItem from './MenuItem';
 import output from './output';
 import Text from './Text';
 import ViewBase from './ViewBase';
@@ -22,7 +22,7 @@ export default {
   List,
   Menu,
   MenuForm,
-  MenuOption,
+  MenuItem,
   output,
   Text,
   ViewBase,
