@@ -1,7 +1,7 @@
 // @flow
 
 import ComponentBase from './ComponentBase';
-import App from './App';
+import Tab from './Tab';
 import Input, { type InputType } from './Input';
 import output from './output';
 
@@ -31,7 +31,7 @@ export type FormField = {
 }
 
 export default class Form extends ComponentBase {
-  _app: App
+  _tab: Tab
   _fields: Array<FormField>
   _selectedFieldIndex: number | void
   _readOnly: ?boolean
@@ -39,15 +39,15 @@ export default class Form extends ComponentBase {
   _onEscape: ?FormOnEscape
 
   constructor(
-    app: App,
+    tab: Tab,
     fields: Array<FormFieldDescription>,
     options: FormOptions = {},
   ) {
     super();
-    this._app = app;
+    this._tab = tab;
     this._fields = fields.map(data => ({
       label: data.label,
-      input: new Input(app, this._onEnter.bind(this), data.default, data.type),
+      input: new Input(tab, this._onEnter.bind(this), data.default, data.type),
     }));
     this._readOnly = options.readOnly;
     this._onNoMoreFields = options.onNoMoreFields;
@@ -129,7 +129,7 @@ export default class Form extends ComponentBase {
       default:
         if (this.selectedField) {
           if (this._readOnly) {
-            this._app.setWarning('This form is not editable.');
+            this._tab.setWarning('This form is not editable.');
           } else {
             await this.selectedField.input.handle(key);
           }

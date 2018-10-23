@@ -1,6 +1,6 @@
 // @flow
 
-import App from './App';
+import Tab from './Tab';
 import ComponentBase from './ComponentBase';
 import output from './output';
 import { KEY_ESCAPE, KEY_ENTER, KEY_BACKSPACE } from './keys';
@@ -11,11 +11,11 @@ export default class Input extends ComponentBase {
   _value: string
   _onEnter: () => Promise<void>
   _type: InputType
-  _app: App
+  _tab: Tab
 
-  constructor(app: App, onEnter: () => Promise<void>, initialValue: string = '', type: InputType = 'string') {
+  constructor(tab: Tab, onEnter: () => Promise<void>, initialValue: string = '', type: InputType = 'string') {
     super();
-    this._app = app;
+    this._tab = tab;
     this._onEnter = onEnter;
     this._value = initialValue;
     this._type = type;
@@ -92,7 +92,7 @@ export default class Input extends ComponentBase {
         if (this._value.length) {
           this._value = '';
         } else {
-          this._app.popView();
+          this._tab.popView();
         }
         handled = true;
         break;

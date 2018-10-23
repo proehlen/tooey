@@ -3,7 +3,7 @@
 import colors from 'colors';
 import cliui from 'cliui';
 
-import App from './App';
+import Tab from './Tab';
 import ComponentBase from './ComponentBase';
 import MenuItem from './MenuItem';
 import output from './output';
@@ -18,21 +18,21 @@ type Direction = -1 | 1
 type NoMoreItemsCallback = (Direction) => Promise<void>
 
 export default class Menu extends ComponentBase {
-  _app: App
+  _tab: Tab
   _items: MenuItem[]
   _selectedIndex: number
   _hasBack: boolean
   _onNoMoreItems: NoMoreItemsCallback
 
   constructor(
-    app: App,
+    tab: Tab,
     items?: MenuItem[] = [],
     allowBackItem: boolean = true,
     onNoMoreItems?: NoMoreItemsCallback,
   ) {
     super();
 
-    this._app = app;
+    this._tab = tab;
     this._items = [];
     if (onNoMoreItems) {
       this._onNoMoreItems = onNoMoreItems;
@@ -115,7 +115,7 @@ export default class Menu extends ComponentBase {
   set selectedIndex(index: number) {
     this._selectedIndex = index;
     if (this.selectedItem) {
-      this._app.setInfo(this.selectedItem.help);
+      this._tab.setInfo(this.selectedItem.help);
     }
   }
 
@@ -156,10 +156,8 @@ export default class Menu extends ComponentBase {
     } else {
       switch (key.toUpperCase()) {
         case KEY_ESCAPE:
-          if (this._app.viewDepth) {
-            this._app.popView();
-          } else {
-            this._app.quit();
+          if (this._tab.viewDepth) {
+            this._tab.popView();
           }
           handled = true;
           break;
@@ -175,14 +173,14 @@ export default class Menu extends ComponentBase {
           break;
         case 'B':
           // Back
-          if (this._app.viewDepth) {
-            this._app.popView();
+          if (this._tab.viewDepth) {
+            this._tab.popView();
             handled = true;
           }
           break;
         case 'Q':
           // Quit
-          this._app.quit();
+          this._tab.quit();
           handled = true;
           break;
         default: {
@@ -192,7 +190,7 @@ export default class Menu extends ComponentBase {
               await item.execute();
             } else {
               // Valid item
-              this._app.setWarning(`Sorry, the '${item.label}' feature is not implemented yet`);
+              this._tab.setWarning(`Sorry, the '${item.label}' feature is not implemented yet`);
             }
             handled = true;
           }

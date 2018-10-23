@@ -12,12 +12,20 @@ export default class App {
   _title: string
   _tabs: Tab[]
   _activeTabIndex: number
-  _initialView: ViewBase
+  _initialView: (Tab) => ViewBase
 
-  constructor(title: string) {
+  constructor(title: string, initialView: (Tab) => ViewBase) {
     this._title = title;
-    this._tabs = [new Tab()];
-    this._activeTabIndex = 0;
+    this._initialView = initialView;
+    this._tabs = [];
+    this.addTab();
+  }
+
+  addTab() {
+    const tab = new Tab(this);
+    tab.pushView(this._initialView(tab));
+    this._tabs = [tab];
+    this._activeTabIndex = this._tabs.length - 1;
   }
 
   get activeTab(): Tab {
@@ -76,10 +84,7 @@ export default class App {
     if (!handled) {
       switch (key) {
         case '+': {
-          const newTab = new Tab();
-          newTab.pushView(this._initialView);
-          this._tabs.push(newTab);
-          this._activeTabIndex = this._tabs.length;
+          this.addTab();
           break;
         }
         default:

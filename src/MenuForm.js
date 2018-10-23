@@ -1,6 +1,6 @@
 // @flow
 
-import App from './App';
+import Tab from './Tab';
 import ComponentBase from './ComponentBase';
 import Form, { type FormFieldDescription } from './Form';
 import Menu from './Menu';
@@ -20,7 +20,7 @@ export default class MenuForm extends ComponentBase {
   _activeComponent: ComponentBase
 
   constructor(
-    app: App,
+    tab: Tab,
     fields: Array<FormFieldDescription>,
     menuItems: Array<MenuItem>,
     options: MenuFormOptions = {},
@@ -29,7 +29,7 @@ export default class MenuForm extends ComponentBase {
 
     // Create form
     this._form = new Form(
-      app,
+      tab,
       fields, {
         onNoMoreFields: this.onNoMoreFields.bind(this),
         onEscape: this.onEscapeFromField.bind(this),
@@ -38,7 +38,7 @@ export default class MenuForm extends ComponentBase {
     );
 
     // Create menu
-    this._menu = new Menu(app, menuItems, true, this.onNoMoreOptions.bind(this));
+    this._menu = new Menu(tab, menuItems, true, this.onNoMoreOptions.bind(this));
 
     // Start with menu active
     this._activeComponent = this._menu;

@@ -4,6 +4,7 @@ import colors from 'colors';
 import cliui from 'cliui';
 
 import output from './output';
+import App from './App';
 import ViewBase from './ViewBase';
 
 declare var process: any;
@@ -19,13 +20,19 @@ export default class Tab {
   _stateMessage: string
   _views: Array<ViewBase>
   _status: Status
+  _app: App
 
-  constructor() {
+  constructor(app: App) {
     this._views = [];
     this._status = {
       type: 'info',
       message: 'Welcome',
     };
+    this._app = app;
+  }
+
+  quit() {
+    this._app.quit();
   }
 
   set stateMessage(stateMessage: string) {
