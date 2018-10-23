@@ -55,18 +55,23 @@ export default class List extends ComponentBase {
     this._page++;
   }
 
-  async handle(key: string) {
+  async handle(key: string): Promise<boolean> {
+    let handled = false;
     switch (key) {
       case KEY_DOWN:
       case KEY_PAGE_DOWN:
         await this.pageDown();
+        handled = true;
         break;
       case KEY_UP:
       case KEY_PAGE_UP:
         await this.pageUp();
+        handled = true;
         break;
       default:
         // Don't handle here
+        handled = false;
     }
+    return handled;
   }
 }

@@ -103,24 +103,28 @@ export default class Form extends ComponentBase {
     }
   }
 
-  async handle(key: string) {
+  async handle(key: string): Promise<boolean> {
+    let handled: boolean = false;
     switch (key) {
       case KEY_ESCAPE:
         if (this._onEscape) {
           this._selectedFieldIndex = undefined;
           await this._onEscape();
+          handled = true;
         }
         break;
       case KEY_UP:
       case KEY_LEFT:
       case KEY_SHIFT_TAB:
         this.cycleSelectedField(-1);
+        handled = true;
         break;
       case KEY_DOWN:
       case KEY_RIGHT:
       case KEY_TAB:
       case KEY_ENTER:
         this.cycleSelectedField(1);
+        handled = true;
         break;
       default:
         if (this.selectedField) {
@@ -129,9 +133,12 @@ export default class Form extends ComponentBase {
           } else {
             await this.selectedField.input.handle(key);
           }
+          handled = true;
         }
         break;
     }
+
+    return handled;
   }
 
   _renderField(index: number, active: boolean) {

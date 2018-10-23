@@ -77,13 +77,16 @@ export default class Input extends ComponentBase {
     }
   }
 
-  async handle(key: string): Promise<void> {
+  async handle(key: string): Promise<boolean> {
+    let handled = false;
     switch (key) {
       case KEY_BACKSPACE:
         this._value = this._value.substr(0, this._value.length - 1);
+        handled = true;
         break;
       case KEY_ENTER:
         await this._onEnter();
+        handled = true;
         break;
       case KEY_ESCAPE:
         if (this._value.length) {
@@ -91,6 +94,7 @@ export default class Input extends ComponentBase {
         } else {
           this._app.popView();
         }
+        handled = true;
         break;
       default:
         switch (this._type) {
@@ -100,6 +104,7 @@ export default class Input extends ComponentBase {
               const nonInt = key.split('').find(char => '0123456789'.indexOf(char) < 0);
               if (!nonInt) {
                 this._value += key;
+                handled = true;
               }
             }
             break;
@@ -109,17 +114,22 @@ export default class Input extends ComponentBase {
             // that haven't been handled by this point.
             if (key.length === 1 && key.charCodeAt(0) > 0x1F) {
               this._value += key;
+              handled = true;
             } else if (key.length > 4) {
               // Need to allow multiple chars for pasting - some of
               // these might not be printable however
               this._value += key;
+              handled = true;
             } else {
               // keys of length 2 to 4 are possibly arrow navigation and other
               // undesirable inputs that will screw up our input control so
               // ignore them.  It presently means that you can't paste
               // less than 5 chars into the input field.
+              handled = false;
             }
         }
     }
+
+    return handled;
   }
 }

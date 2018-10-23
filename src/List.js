@@ -253,11 +253,13 @@ export default class List<T> extends ComponentBase {
   /**
    * Handle user input
    */
-  async handle(key: string): Promise<void> {
+  async handle(key: string): Promise<boolean> {
+    let handled = false;
     switch (key) {
       case KEY_ENTER:
         if (this._onEnter) {
           await this._onEnter(this.selectedRowIndex);
+          handled = true;
         }
         break;
       case KEY_DOWN:
@@ -266,6 +268,7 @@ export default class List<T> extends ComponentBase {
         } else {
           await this.pageDown();
         }
+        handled = true;
         break;
       case KEY_UP:
         if (this._rowSelection) {
@@ -273,15 +276,20 @@ export default class List<T> extends ComponentBase {
         } else {
           await this.pageUp();
         }
+        handled = true;
         break;
       case KEY_PAGE_DOWN:
         await this.pageDown();
+        handled = true;
         break;
       case KEY_PAGE_UP:
         await this.pageUp();
+        handled = true;
         break;
       default:
         // Don't handle here
+        handled = false;
     }
+    return handled;
   }
 }

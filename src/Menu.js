@@ -147,11 +147,12 @@ export default class Menu extends ComponentBase {
   }
 
 
-  async handle(key: string): Promise<void> {
+  async handle(key: string): Promise<boolean> {
+    let handled = false;
     if (key === KEY_ENTER) {
       // Call back this method (maybe in child class) with key
       // for active item
-      await this.handle(this.selectedItem.key);
+      handled = await this.handle(this.selectedItem.key);
     } else {
       switch (key.toUpperCase()) {
         case KEY_ESCAPE:
@@ -160,24 +161,29 @@ export default class Menu extends ComponentBase {
           } else {
             this._app.quit();
           }
+          handled = true;
           break;
         case KEY_LEFT:
         case KEY_SHIFT_TAB:
           await this.cycleSelectedItem(-1);
+          handled = true;
           break;
         case KEY_RIGHT:
         case KEY_TAB:
           await this.cycleSelectedItem(1);
+          handled = true;
           break;
         case 'B':
           // Back
           if (this._app.viewDepth) {
             this._app.popView();
+            handled = true;
           }
           break;
         case 'Q':
           // Quit
           this._app.quit();
+          handled = true;
           break;
         default: {
           const item = this._items.find(candidate => candidate.key === key.toUpperCase());
@@ -188,10 +194,12 @@ export default class Menu extends ComponentBase {
               // Valid item
               this._app.setWarning(`Sorry, the '${item.label}' feature is not implemented yet`);
             }
+            handled = true;
           }
           break;
         }
       }
     }
+    return handled;
   }
 }

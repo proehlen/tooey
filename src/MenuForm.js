@@ -70,15 +70,18 @@ export default class MenuForm extends ComponentBase {
     this._activeComponent = this._menu;
   }
 
-  async handle(key: string) {
+  async handle(key: string): Promise<boolean> {
+    let handled = false;
     if ((key === KEY_DOWN || key === KEY_UP) && this._activeComponent === this._menu) {
       // Menu doesn't respond to arrow up/down - in this view
       // we will use it to shift to form if menu is active
       this._activeComponent = this._form;
       this._form.setFirstFieldSelected();
+      handled = true;
     } else {
-      await this._activeComponent.handle(key);
+      handled = await this._activeComponent.handle(key);
     }
+    return handled;
   }
 
   render() {

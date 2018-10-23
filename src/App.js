@@ -1,5 +1,6 @@
 // @flow
 
+// import colors from 'colors';
 import cliui from 'cliui';
 import output from './output';
 import ViewBase from './ViewBase';
@@ -77,8 +78,15 @@ export default class App {
   _renderTitle() {
     output.cursorTo(0, 0);
     const ui = cliui();
+    let tabs = '';
+    for (let i = 0; i < this._tabs.length; i++) {
+      const tab = this._tabs[i];
+      // const active = i === this._activeTabIndex;
+      tabs += ` ${tab.activeView.title} |`;
+    }
+    tabs += ' +';
     ui.div({
-      text: this.activeTab.activeView.title,
+      text: tabs,
       align: 'left',
     }, {
       text: this._title,
