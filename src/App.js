@@ -83,7 +83,7 @@ export default class App {
   render() {
     try {
       output.clear();
-      this._renderTitle();
+      this._renderTitleBar();
       this.activeTab.render();
     } catch (err) {
       // No errors should come up to this high level,
@@ -124,31 +124,46 @@ export default class App {
     }
   }
 
-  _renderTitle() {
-    output.cursorTo(0, 0);
-    const ui = cliui();
-    let tabsString = `${colors.blue(TABS_PREFIX)}  `;
+  _getSingleTabText() {
+    let tabsText = this.activeTab.activeView.title;
+    tabsText += ' ';
+    tabsText += colors.bold('+');
+    return tabsText;
+  }
+
+  _getMultiTabsText() {
+    let tabsText = `${colors.blue(TABS_PREFIX)}  `;
     for (let i = 0; i < this._tabs.length; i++) {
       const tab = this._tabs[i];
       const active = i === this._activeTabIndex;
-      tabsString += '| ';
+      tabsText += '| ';
       const tabNumber = i + 1;
-      tabsString += `${colors.bold(tabNumber)}.`;
+      tabsText += `${colors.bold(tabNumber)}.`;
       let tabTitle = `${tab.activeView.title}`;
       if (active) {
         tabTitle = `${colors.inverse(tabTitle)}`;
       }
-      tabsString += tabTitle;
+      tabsText += tabTitle;
     }
-    tabsString += ' | ';
+    tabsText += ' |';
     if (this._tabs.length < MAX_TABS) {
-      tabsString += colors.bold('+');
+      tabsText += ` ${colors.bold('+')}`;
     }
     if (this._tabs.length > 1) {
-      tabsString += colors.bold('-');
+      tabsText += ` ${colors.bold('-')}`;
     }
+
+    return tabsText;
+  }
+
+  _renderTitleBar() {
+    output.cursorTo(0, 0);
+    const tabsText = this._tabs.length > 1
+      ? this._getMultiTabsText()
+      : this._getSingleTabText();
+    const ui = cliui();
     ui.div({
-      text: tabsString,
+      text: tabsText,
       align: 'left',
       width: output.width - this._title.length,
     }, {
