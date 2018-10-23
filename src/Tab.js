@@ -16,7 +16,7 @@ type Status = {
 }
 
 export default class Tab {
-  _state: string
+  _stateMessage: string
   _views: Array<ViewBase>
   _status: Status
 
@@ -28,13 +28,13 @@ export default class Tab {
     };
   }
 
-  set state(state: string) {
-    this._state = state;
+  set stateMessage(stateMessage: string) {
+    this._stateMessage = stateMessage;
   }
 
-  get state(): string {
-    return this._state
-      ? this._state
+  get stateMessage(): string {
+    return this._stateMessage
+      ? this._stateMessage
       : '';
   }
 
@@ -128,15 +128,15 @@ export default class Tab {
     output.cursorTo(0, output.height - 2);
     const ui = cliui({ wrap: false });
 
-    const stateWidth = this.state.length;
-    const messageWidth = output.width - stateWidth;
+    const stateMessageWidth = this.stateMessage.length;
+    const messageWidth = output.width - stateMessageWidth;
     const message = this.status.message.substr(0, messageWidth);
     ui.div({
       text: colors[bgColor][fgColor](message),
       width: messageWidth,
     }, {
-      text: this.state,
-      width: stateWidth,
+      text: this.stateMessage,
+      width: stateMessageWidth,
     });
     console.log(ui.toString());
   }

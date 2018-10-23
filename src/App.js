@@ -24,12 +24,12 @@ export default class App {
     return this._tabs[this._activeTabIndex];
   }
 
-  set state(state: string) {
-    this.activeTab._state = state;
+  set stateMessage(stateMessage: string) {
+    this.activeTab._stateMessage = stateMessage;
   }
 
-  get state(): string {
-    return this.activeTab.state;
+  get stateMessage(): string {
+    return this.activeTab.stateMessage;
   }
 
   get activeView(): ViewBase {
@@ -72,7 +72,20 @@ export default class App {
 
 
   async handle(key: string) {
-    await this.activeTab.handle(key);
+    const handled = await this.activeTab.handle(key);
+    if (!handled) {
+      switch (key) {
+        case '+': {
+          const newTab = new Tab();
+          newTab.pushView(this._initialView);
+          this._tabs.push(newTab);
+          this._activeTabIndex = this._tabs.length;
+          break;
+        }
+        default:
+          // Not handled
+      }
+    }
   }
 
   _renderTitle() {
