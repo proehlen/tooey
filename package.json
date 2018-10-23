@@ -1,6 +1,6 @@
 {
   "name": "tooey",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "Framework for building Text UIs with Node.js",
   "homepage": "https://github.com/proehlen/tooey#README.md",
   "main": "lib/index.js",
