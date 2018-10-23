@@ -17,16 +17,12 @@ type Status = {
 
 export default class App {
   _title: string
-  _subtitle: string
   _state: string
   _views: Array<ViewBase>
   _status: Status
 
-  constructor(title: string, subtitle?: string) {
+  constructor(title: string) {
     this._title = title;
-    if (subtitle) {
-      this._subtitle = subtitle;
-    }
     this._views = [];
     this._status = {
       type: 'info',
@@ -157,9 +153,6 @@ export default class App {
       align: 'left',
     }, {
       text: this._title,
-      align: 'center',
-    }, {
-      text: this._subtitle,
       align: 'right',
     });
     console.log(ui.toString());
