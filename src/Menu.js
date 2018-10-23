@@ -3,7 +3,7 @@
 import colors from 'colors';
 import cliui from 'cliui';
 
-import App from './App';
+import Tab from './Tab';
 import ComponentBase from './ComponentBase';
 import MenuItem from './MenuItem';
 import output from './output';
@@ -13,26 +13,27 @@ import {
 
 
 const ITEM_GAP = 3; // Render gap between items
+const MENU_PREFIX = 'Menu';
 
 type Direction = -1 | 1
 type NoMoreItemsCallback = (Direction) => Promise<void>
 
 export default class Menu extends ComponentBase {
-  _app: App
+  _tab: Tab
   _items: MenuItem[]
   _selectedIndex: number
   _hasBack: boolean
   _onNoMoreItems: NoMoreItemsCallback
 
   constructor(
-    app: App,
+    tab: Tab,
     items?: MenuItem[] = [],
     allowBackItem: boolean = true,
     onNoMoreItems?: NoMoreItemsCallback,
   ) {
     super();
 
-    this._app = app;
+    this._tab = tab;
     this._items = [];
     if (onNoMoreItems) {
       this._onNoMoreItems = onNoMoreItems;
@@ -68,8 +69,8 @@ export default class Menu extends ComponentBase {
         ? colors.bold(item.key)
         : item.key;
       return `${acc}${separator}${preKeyText}${keyText}${postKeyText}`;
-    }, '');
-    ui.div(text);
+    }, `${colors.blue(MENU_PREFIX)} | `);
+    ui.div(`${text} |`);
 
     console.log(ui.toString());
     if (!inactive) {
@@ -115,7 +116,7 @@ export default class Menu extends ComponentBase {
   set selectedIndex(index: number) {
     this._selectedIndex = index;
     if (this.selectedItem) {
-      this._app.setInfo(this.selectedItem.help);
+      this._tab.setInfo(this.selectedItem.help);
     }
   }
 
@@ -138,7 +139,7 @@ export default class Menu extends ComponentBase {
   }
 
   _cursorToselectedItem() {
-    let x = 0;
+    let x = MENU_PREFIX.length + 3;
     for (let i = 0; i < this.selectedIndex; i++) {
       const item = this._items[i];
       x += (item.label.length + ITEM_GAP);
@@ -147,37 +148,41 @@ export default class Menu extends ComponentBase {
   }
 
 
-  async handle(key: string): Promise<void> {
+  async handle(key: string): Promise<boolean> {
+    let handled = false;
     if (key === KEY_ENTER) {
       // Call back this method (maybe in child class) with key
       // for active item
-      await this.handle(this.selectedItem.key);
+      handled = await this.handle(this.selectedItem.key);
     } else {
       switch (key.toUpperCase()) {
         case KEY_ESCAPE:
-          if (this._app.viewDepth) {
-            this._app.popView();
-          } else {
-            this._app.quit();
+          if (this._tab.viewDepth) {
+            this._tab.popView();
           }
+          handled = true;
           break;
         case KEY_LEFT:
         case KEY_SHIFT_TAB:
           await this.cycleSelectedItem(-1);
+          handled = true;
           break;
         case KEY_RIGHT:
         case KEY_TAB:
           await this.cycleSelectedItem(1);
+          handled = true;
           break;
         case 'B':
           // Back
-          if (this._app.viewDepth) {
-            this._app.popView();
+          if (this._tab.viewDepth) {
+            this._tab.popView();
+            handled = true;
           }
           break;
         case 'Q':
           // Quit
-          this._app.quit();
+          this._tab.quit();
+          handled = true;
           break;
         default: {
           const item = this._items.find(candidate => candidate.key === key.toUpperCase());
@@ -186,12 +191,14 @@ export default class Menu extends ComponentBase {
               await item.execute();
             } else {
               // Valid item
-              this._app.setWarning(`Sorry, the '${item.label}' feature is not implemented yet`);
+              this._tab.setWarning(`Sorry, the '${item.label}' feature is not implemented yet`);
             }
+            handled = true;
           }
           break;
         }
       }
     }
+    return handled;
   }
 }

@@ -1,6 +1,6 @@
 // @flow
 
-import App from './App';
+import Tab from './Tab';
 import ComponentBase from './ComponentBase';
 import output from './output';
 
@@ -9,16 +9,16 @@ import {
 } from './keys';
 
 export default class List extends ComponentBase {
-  _app: App
+  _tab: Tab
   _text: string
   _page: number
 
   constructor(
-    app: App,
+    tab: Tab,
     text: string,
   ) {
     super();
-    this._app = app;
+    this._tab = tab;
     this._text = text;
     this._page = 1;
   }
@@ -33,7 +33,7 @@ export default class List extends ComponentBase {
 
   async pageUp() {
     if (this._page === 1) {
-      this._app.setInfo('Already at start');
+      this._tab.setInfo('Already at start');
       return;
     }
     this._page--;
@@ -49,24 +49,29 @@ export default class List extends ComponentBase {
 
   async pageDown() {
     if (this._page >= this._pageCount) {
-      this._app.setInfo('No more pages');
+      this._tab.setInfo('No more pages');
       return;
     }
     this._page++;
   }
 
-  async handle(key: string) {
+  async handle(key: string): Promise<boolean> {
+    let handled = false;
     switch (key) {
       case KEY_DOWN:
       case KEY_PAGE_DOWN:
         await this.pageDown();
+        handled = true;
         break;
       case KEY_UP:
       case KEY_PAGE_UP:
         await this.pageUp();
+        handled = true;
         break;
       default:
         // Don't handle here
+        handled = false;
     }
+    return handled;
   }
 }

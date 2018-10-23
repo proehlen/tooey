@@ -32,7 +32,7 @@ export default class InputHelp extends ComponentBase {
   /**
    * Handle user input (throws error)
    */
-  async handle(key: string): Promise<void> {
+  async handle(key: string): Promise<boolean> {
     throw new Error(`Input help cannot handle input (key: ${key}).`);
   }
 }

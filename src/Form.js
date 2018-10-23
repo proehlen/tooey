@@ -1,7 +1,7 @@
 // @flow
 
 import ComponentBase from './ComponentBase';
-import App from './App';
+import Tab from './Tab';
 import Input, { type InputType } from './Input';
 import output from './output';
 
@@ -31,7 +31,7 @@ export type FormField = {
 }
 
 export default class Form extends ComponentBase {
-  _app: App
+  _tab: Tab
   _fields: Array<FormField>
   _selectedFieldIndex: number | void
   _readOnly: ?boolean
@@ -39,15 +39,15 @@ export default class Form extends ComponentBase {
   _onEscape: ?FormOnEscape
 
   constructor(
-    app: App,
+    tab: Tab,
     fields: Array<FormFieldDescription>,
     options: FormOptions = {},
   ) {
     super();
-    this._app = app;
+    this._tab = tab;
     this._fields = fields.map(data => ({
       label: data.label,
-      input: new Input(app, this._onEnter.bind(this), data.default, data.type),
+      input: new Input(tab, this._onEnter.bind(this), data.default, data.type),
     }));
     this._readOnly = options.readOnly;
     this._onNoMoreFields = options.onNoMoreFields;
@@ -103,35 +103,42 @@ export default class Form extends ComponentBase {
     }
   }
 
-  async handle(key: string) {
+  async handle(key: string): Promise<boolean> {
+    let handled: boolean = false;
     switch (key) {
       case KEY_ESCAPE:
         if (this._onEscape) {
           this._selectedFieldIndex = undefined;
           await this._onEscape();
+          handled = true;
         }
         break;
       case KEY_UP:
       case KEY_LEFT:
       case KEY_SHIFT_TAB:
         this.cycleSelectedField(-1);
+        handled = true;
         break;
       case KEY_DOWN:
       case KEY_RIGHT:
       case KEY_TAB:
       case KEY_ENTER:
         this.cycleSelectedField(1);
+        handled = true;
         break;
       default:
         if (this.selectedField) {
           if (this._readOnly) {
-            this._app.setWarning('This form is not editable.');
+            this._tab.setWarning('This form is not editable.');
           } else {
             await this.selectedField.input.handle(key);
           }
+          handled = true;
         }
         break;
     }
+
+    return handled;
   }
 
   _renderField(index: number, active: boolean) {

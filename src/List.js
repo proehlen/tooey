@@ -4,7 +4,7 @@ import colors from 'colors';
 import { rightPad } from 'stringfu';
 
 
-import App from './App';
+import Tab from './Tab';
 import ComponentBase from './ComponentBase';
 import Menu from './Menu';
 import MenuItem from './MenuItem';
@@ -62,7 +62,7 @@ export type ListOptions = {
  * A multi-column List component with optional row selection
  */
 export default class List<T> extends ComponentBase {
-  _app: App
+  _tab: Tab
   _startIndex: number
   _data: ListData<T>
   _columns: Array<ListColumn<T>>
@@ -76,13 +76,13 @@ export default class List<T> extends ComponentBase {
    * List constructor
    */
   constructor(
-    app: App,
+    tab: Tab,
     columns: Array<ListColumn<T>>,
     data: ListData<T>,
     options: ListOptions = {},
   ) {
     super();
-    this._app = app;
+    this._tab = tab;
     this._columns = columns;
     this.setData(data);
     this._showHeadings = options.showHeadings === undefined ? true : options.showHeadings;
@@ -165,7 +165,7 @@ export default class List<T> extends ComponentBase {
    */
   async pageUp(): Promise<void> {
     if (this._startIndex === 0) {
-      this._app.setInfo('Already at start');
+      this._tab.setInfo('Already at start');
       return;
     }
     this._startIndex -= output.contentHeight;
@@ -203,7 +203,7 @@ export default class List<T> extends ComponentBase {
    */
   async pageDown(): Promise<void> {
     if ((this._startIndex + output.contentHeight) > this._data.length) {
-      this._app.setInfo('No more pages');
+      this._tab.setInfo('No more pages');
       return;
     }
     this._startIndex += output.contentHeight;
@@ -243,7 +243,7 @@ export default class List<T> extends ComponentBase {
     } else if (!isLastPage) {
       this._selectedPageRow++;
     } else {
-      this._app.setInfo('No more records');
+      this._tab.setInfo('No more records');
     }
     if (this._onSelect) {
       await this._onSelect();
@@ -253,11 +253,13 @@ export default class List<T> extends ComponentBase {
   /**
    * Handle user input
    */
-  async handle(key: string): Promise<void> {
+  async handle(key: string): Promise<boolean> {
+    let handled = false;
     switch (key) {
       case KEY_ENTER:
         if (this._onEnter) {
           await this._onEnter(this.selectedRowIndex);
+          handled = true;
         }
         break;
       case KEY_DOWN:
@@ -266,6 +268,7 @@ export default class List<T> extends ComponentBase {
         } else {
           await this.pageDown();
         }
+        handled = true;
         break;
       case KEY_UP:
         if (this._rowSelection) {
@@ -273,15 +276,20 @@ export default class List<T> extends ComponentBase {
         } else {
           await this.pageUp();
         }
+        handled = true;
         break;
       case KEY_PAGE_DOWN:
         await this.pageDown();
+        handled = true;
         break;
       case KEY_PAGE_UP:
         await this.pageUp();
+        handled = true;
         break;
       default:
         // Don't handle here
+        handled = false;
     }
+    return handled;
   }
 }
