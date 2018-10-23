@@ -1,85 +1,65 @@
 // @flow
 
-import colors from 'colors';
 import cliui from 'cliui';
-
 import output from './output';
 import ViewBase from './ViewBase';
+import Tab from './Tab';
 
 declare var process: any;
 
-type StatusType = 'error' | 'warning' | 'info' | 'none';
-
-type Status = {
-  type: StatusType,
-  message: string,
-}
-
 export default class App {
   _title: string
-  _state: string
-  _views: Array<ViewBase>
-  _status: Status
+  _tabs: Tab[]
+  _activeTabIndex: number
+  _initialView: ViewBase
 
   constructor(title: string) {
     this._title = title;
-    this._views = [];
-    this._status = {
-      type: 'info',
-      message: 'Welcome',
-    };
+    this._tabs = [new Tab()];
+    this._activeTabIndex = 0;
+  }
+
+  get activeTab(): Tab {
+    return this._tabs[this._activeTabIndex];
   }
 
   set state(state: string) {
-    this._state = state;
+    this.activeTab._state = state;
   }
 
   get state(): string {
-    return this._state
-      ? this._state
-      : '';
+    return this.activeTab.state;
   }
 
   get activeView(): ViewBase {
-    return this._views[this._views.length - 1];
+    return this.activeTab.activeView;
   }
 
   get viewDepth() {
-    return this._views.length - 1;
+    return this.activeTab.viewDepth;
   }
 
   get status() {
-    return this._status;
+    return this.activeTab.status;
   }
 
   setError(message: string) {
-    this._status = {
-      type: 'error',
-      message,
-    };
+    this.activeTab.setError(message);
   }
 
   setInfo(message: string) {
-    this._status = {
-      type: 'info',
-      message,
-    };
+    this.activeTab.setInfo(message);
   }
 
   setWarning(message: string) {
-    this._status = {
-      type: 'warning',
-      message,
-    };
+    this.activeTab.setWarning(message);
   }
 
   render() {
     try {
       output.clear();
       this._renderTitle();
-      this._renderStatus();
-      output.cursorTo(0, output.contentStartRow);
-      this.activeView.render(false);
+      this.activeTab.render();
     } catch (err) {
       // No errors should come up to this high level,
       // Will probably need a coder to sort out
@@ -89,67 +69,16 @@ export default class App {
     }
   }
 
-  _clearStatus() {
-    this._status = {
-      type: 'none',
-      message: '',
-    };
-  }
 
   async handle(key: string) {
-    this._clearStatus();
-    try {
-      await this.activeView.handle(key);
-    } catch (err) {
-      // No errors should come up to this high level,
-      // Will probably need a coder to sort out
-      output.clear();
-      console.error(err);
-      process.exit(0);
-    }
-  }
-
-  _renderStatus() {
-    let bgColor;
-    let fgColor;
-    switch (this._status.type) {
-      case 'error':
-        bgColor = 'bgRed';
-        fgColor = 'yellow';
-        break;
-      case 'warning':
-        bgColor = 'bgYellow';
-        fgColor = 'black';
-        break;
-      case 'info':
-        bgColor = 'bgBlue';
-        fgColor = 'white';
-        break;
-      default:
-        bgColor = 'white';
-        fgColor = 'black';
-    }
-    output.cursorTo(0, output.height - 2);
-    const ui = cliui({ wrap: false });
-
-    const stateWidth = this.state.length;
-    const messageWidth = output.width - stateWidth;
-    const message = this.status.message.substr(0, messageWidth);
-    ui.div({
-      text: colors[bgColor][fgColor](message),
-      width: messageWidth,
-    }, {
-      text: this.state,
-      width: stateWidth,
-    });
-    console.log(ui.toString());
+    await this.activeTab.handle(key);
   }
 
   _renderTitle() {
     output.cursorTo(0, 0);
     const ui = cliui();
     ui.div({
-      text: this.activeView.title,
+      text: this.activeTab.activeView.title,
       align: 'left',
     }, {
       text: this._title,
@@ -159,16 +88,15 @@ export default class App {
   }
 
   pushView(component: ViewBase) {
-    this._views.push(component);
+    this.activeTab.pushView(component);
   }
 
   popView() {
-    this._views.pop();
+    this.activeTab.popView();
   }
 
   replaceView(component: ViewBase) {
-    this._views.pop();
-    this._views.push(component);
+    this.activeTab.replaceView(component);
   }
 
   quit() {
