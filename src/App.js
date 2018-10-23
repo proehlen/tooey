@@ -1,12 +1,17 @@
 // @flow
 
-// import colors from 'colors';
+import colors from 'colors';
 import cliui from 'cliui';
+import { isInteger } from 'stringfu';
+
 import output from './output';
 import ViewBase from './ViewBase';
 import Tab from './Tab';
 
 declare var process: any;
+
+const TABS_PREFIX = 'Tab';
+const MAX_TABS = 3;
 
 export default class App {
   _title: string
@@ -18,14 +23,25 @@ export default class App {
     this._title = title;
     this._initialView = initialView;
     this._tabs = [];
-    this.addTab();
+    this._addTab();
   }
 
-  addTab() {
-    const tab = new Tab(this);
-    tab.pushView(this._initialView(tab));
-    this._tabs = [tab];
-    this._activeTabIndex = this._tabs.length - 1;
+  _addTab() {
+    if (this._tabs.length < MAX_TABS) {
+      const tab = new Tab(this);
+      tab.pushView(this._initialView(tab));
+      this._tabs.push(tab);
+      this._activeTabIndex = this._tabs.length - 1;
+    }
+  }
+
+  _removeTab() {
+    if (this._tabs.length > 1) {
+      this._tabs.splice(this._activeTabIndex, 1);
+      if (this._activeTabIndex > this._tabs.length - 1) {
+        this._activeTabIndex--;
+      }
+    }
   }
 
   get activeTab(): Tab {
@@ -80,35 +96,65 @@ export default class App {
 
 
   async handle(key: string) {
-    const handled = await this.activeTab.handle(key);
-    if (!handled) {
-      switch (key) {
-        case '+': {
-          this.addTab();
-          break;
+    try {
+      const handled = await this.activeTab.handle(key);
+      if (!handled) {
+        switch (key) {
+          case '-':
+            this._removeTab();
+            break;
+          case '+':
+            this._addTab();
+            break;
+          default:
+            if (isInteger(key)) {
+              const newIndex = parseInt(key, 10) - 1;
+              if (newIndex >= 0 && newIndex < this._tabs.length) {
+                this._activeTabIndex = newIndex;
+              }
+            }
         }
-        default:
-          // Not handled
       }
+    } catch (err) {
+      // No errors should come up to this high level,
+      // Will probably need a dev to sort out
+      output.clear();
+      console.error(err);
+      process.exit(0);
     }
   }
 
   _renderTitle() {
     output.cursorTo(0, 0);
     const ui = cliui();
-    let tabs = '';
+    let tabsString = `${colors.blue(TABS_PREFIX)}  `;
     for (let i = 0; i < this._tabs.length; i++) {
       const tab = this._tabs[i];
-      // const active = i === this._activeTabIndex;
-      tabs += ` ${tab.activeView.title} |`;
+      const active = i === this._activeTabIndex;
+      tabsString += '| ';
+      const tabNumber = i + 1;
+      tabsString += `${colors.bold(tabNumber)}.`;
+      let tabTitle = `${tab.activeView.title}`;
+      if (active) {
+        tabTitle = `${colors.inverse(tabTitle)}`;
+      }
+      tabsString += tabTitle;
     }
-    tabs += ' +';
+    tabsString += ' | ';
+    if (this._tabs.length < MAX_TABS) {
+      tabsString += colors.bold('+');
+    }
+    if (this._tabs.length > 1) {
+      tabsString += colors.bold('-');
+    }
     ui.div({
-      text: tabs,
+      text: tabsString,
       align: 'left',
+      width: output.width - this._title.length,
     }, {
       text: this._title,
       align: 'right',
+      width: this._title.length,
     });
     console.log(ui.toString());
   }

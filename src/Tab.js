@@ -99,17 +99,9 @@ export default class Tab {
     };
   }
 
-  async handle(key: string) {
+  async handle(key: string): Promise<boolean> {
     this._clearStatus();
-    try {
-      await this.activeView.handle(key);
-    } catch (err) {
-      // No errors should come up to this high level,
-      // Will probably need a coder to sort out
-      output.clear();
-      console.error(err);
-      process.exit(0);
-    }
+    return this.activeView.handle(key);
   }
 
   _renderStatus() {

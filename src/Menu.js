@@ -13,6 +13,7 @@ import {
 
 
 const ITEM_GAP = 3; // Render gap between items
+const MENU_PREFIX = 'Menu';
 
 type Direction = -1 | 1
 type NoMoreItemsCallback = (Direction) => Promise<void>
@@ -68,8 +69,8 @@ export default class Menu extends ComponentBase {
         ? colors.bold(item.key)
         : item.key;
       return `${acc}${separator}${preKeyText}${keyText}${postKeyText}`;
-    }, '');
-    ui.div(text);
+    }, `${colors.blue(MENU_PREFIX)} | `);
+    ui.div(`${text} |`);
 
     console.log(ui.toString());
     if (!inactive) {
@@ -138,7 +139,7 @@ export default class Menu extends ComponentBase {
   }
 
   _cursorToselectedItem() {
-    let x = 0;
+    let x = MENU_PREFIX.length + 3;
     for (let i = 0; i < this.selectedIndex; i++) {
       const item = this._items[i];
       x += (item.label.length + ITEM_GAP);
