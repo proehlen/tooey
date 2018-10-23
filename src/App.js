@@ -154,10 +154,10 @@ export default class App {
     const ui = cliui();
     ui.div({
       text: this.activeView.title,
-      align: 'center',
+      align: 'left',
     }, {
       text: this._title,
-      align: 'left',
+      align: 'center',
     }, {
       text: this._subtitle,
       align: 'right',
