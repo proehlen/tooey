@@ -65,31 +65,30 @@ export default class Tab {
   }
 
   setInfo(message: string) {
-    this._status = {
-      type: 'info',
-      message,
-    };
+    // Don't overrride higher severity message
+    if (!this._status || (this.status.type !== 'error' && this.status.type !== 'warning')) {
+      this._status = {
+        type: 'info',
+        message,
+      };
+    }
   }
 
   setWarning(message: string) {
-    this._status = {
-      type: 'warning',
-      message,
-    };
+    // Don't overrride higher severity message
+    if (!this._status || this.status.type !== 'error') {
+      this._status = {
+        type: 'warning',
+        message,
+      };
+    }
   }
 
   render() {
-    try {
-      this._renderStatus();
-      output.cursorTo(0, output.contentStartRow);
-      this.activeView.render(false);
-    } catch (err) {
-      // No errors should come up to this high level,
-      // Will probably need a coder to sort out
-      output.clear();
-      console.error(err);
-      process.exit(0);
-    }
+    debugger;
+    this._renderStatus();
+    output.cursorTo(0, output.contentStartRow);
+    this.activeView.render(false);
   }
 
   _clearStatus() {
