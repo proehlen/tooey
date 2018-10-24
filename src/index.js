@@ -9,6 +9,8 @@ import Menu from './Menu';
 import MenuForm from './MenuForm';
 import MenuItem from './MenuItem';
 import output from './output';
+import SelectView from './SelectView';
+import Tab from './Tab';
 import Text from './Text';
 import ViewBase from './ViewBase';
 
@@ -24,6 +26,8 @@ export default {
   MenuForm,
   MenuItem,
   output,
+  SelectView,
+  Tab,
   Text,
   ViewBase,
 };
