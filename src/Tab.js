@@ -85,7 +85,6 @@ export default class Tab {
   }
 
   render() {
-    debugger;
     this._renderStatus();
     output.cursorTo(0, output.contentStartRow);
     this.activeView.render(false);
