@@ -52,6 +52,9 @@ export default class Menu extends ComponentBase {
 
     // Add items specific to this menu
     items.reverse().forEach(item => this.addItem(item, 'start'));
+
+    // Select first item
+    this.setFirstItemSelected();
   }
 
   getVisibleItems(): MenuItem[] {
@@ -60,13 +63,14 @@ export default class Menu extends ComponentBase {
   }
 
   render(inactive: boolean) {
-    // Ensure item is selected
+    // After processing, some menu items may no longer be visible (dynamically hidden) including
+    // the one that was previously selected. Ensure a menu item is still selected
     const visibleItems = this.getVisibleItems();
     let selectedIndex = visibleItems.indexOf(this._selectedItem);
     if (selectedIndex < 0) {
       // No menu item selected - select first item
       selectedIndex = 0;
-      this._selectedItem = visibleItems[selectedIndex];
+      this.setFirstItemSelected();
     }
 
     // Build items text
@@ -105,21 +109,21 @@ export default class Menu extends ComponentBase {
     }
   }
 
-  setSelectedItem(key: string) {
-    const item = this.getVisibleItems().find(candidate => candidate.key === key);
+  setSelectedItem(item: MenuItem) {
+    this._selectedItem = item;
     if (item) {
-      this._selectedItem = item;
+      this._tab.setInfo(item.help);
     }
   }
 
   setFirstItemSelected() {
     const visibleItems = this.getVisibleItems();
-    this._selectedItem = visibleItems[0];
+    this.setSelectedItem(visibleItems[0]);
   }
 
   setLastItemSelected() {
     const visibleItems = this.getVisibleItems();
-    this._selectedItem = visibleItems[visibleItems.length - 1];
+    this.setSelectedItem(visibleItems[visibleItems.length - 1]);
   }
 
   get selectedItem() { return this._selectedItem; }
@@ -151,7 +155,7 @@ export default class Menu extends ComponentBase {
           this.setFirstItemSelected();
         }
       } else {
-        this._selectedItem = visibleItems[selectedIndex];
+        this.setSelectedItem(visibleItems[selectedIndex]);
       }
     }
   }
