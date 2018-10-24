@@ -21,7 +21,7 @@ type NoMoreItemsCallback = (Direction) => Promise<void>
 export default class Menu extends ComponentBase {
   _tab: Tab
   _items: MenuItem[]
-  _selectedIndex: number
+  _selectedItem: MenuItem
   _hasBack: boolean
   _onNoMoreItems: NoMoreItemsCallback
 
@@ -52,29 +52,41 @@ export default class Menu extends ComponentBase {
 
     // Add items specific to this menu
     items.reverse().forEach(item => this.addItem(item, 'start'));
+  }
 
-    // Set active/default  action
-    this.selectedIndex = 0;
+  getVisibleItems(): MenuItem[] {
+    return this._items
+      .filter(item => !item.checkVisible || item.checkVisible());
   }
 
   render(inactive: boolean) {
+    // Ensure item is selected
+    const visibleItems = this.getVisibleItems();
+    let selectedIndex = visibleItems.indexOf(this._selectedItem);
+    if (selectedIndex < 0) {
+      // No menu item selected - select first item
+      selectedIndex = 0;
+      this._selectedItem = visibleItems[selectedIndex];
+    }
+
     // Build items text
     output.cursorTo(0, output.menuRow);
     const ui = cliui();
-    const text = this._items.reduce((acc, item, index) => {
-      const separator = index > 0 ? ` ${String.fromCharCode(183)} ` : '';
-      const preKeyText = (item.keyPosition) ? item.label.substring(0, item.keyPosition) : '';
-      const postKeyText = item.label.substr(item.keyPosition + 1);
-      const keyText = !inactive
-        ? colors.bold(item.key)
-        : item.key;
-      return `${acc}${separator}${preKeyText}${keyText}${postKeyText}`;
-    }, `${colors.blue(MENU_PREFIX)} | `);
+    const text = visibleItems
+      .reduce((acc, item, index) => {
+        const separator = index > 0 ? ` ${String.fromCharCode(183)} ` : '';
+        const preKeyText = (item.keyPosition) ? item.label.substring(0, item.keyPosition) : '';
+        const postKeyText = item.label.substr(item.keyPosition + 1);
+        const keyText = !inactive
+          ? colors.bold(item.key)
+          : item.key;
+        return `${acc}${separator}${preKeyText}${keyText}${postKeyText}`;
+      }, `${colors.blue(MENU_PREFIX)} | `);
     ui.div(`${text} |`);
 
     console.log(ui.toString());
     if (!inactive) {
-      this._cursorToselectedItem();
+      this._cursorToSelectedItem();
     }
   }
 
@@ -94,63 +106,70 @@ export default class Menu extends ComponentBase {
   }
 
   setSelectedItem(key: string) {
-    const index = this._items.findIndex(item => item.key === key);
-    if (index < 0) {
-      throw new Error(`Cannot set selected menu item; missing key '${key}'`);
+    const item = this.getVisibleItems().find(candidate => candidate.key === key);
+    if (item) {
+      this._selectedItem = item;
     }
-    this.selectedIndex = index;
   }
 
   setFirstItemSelected() {
-    this.selectedIndex = 0;
+    const visibleItems = this.getVisibleItems();
+    this._selectedItem = visibleItems[0];
   }
 
   setLastItemSelected() {
-    this.selectedIndex = this._items.length - 1;
+    const visibleItems = this.getVisibleItems();
+    this._selectedItem = visibleItems[visibleItems.length - 1];
   }
 
-  get selectedIndex() { return this._selectedIndex; }
-  get selectedItem() { return this._items[this._selectedIndex]; }
+  get selectedItem() { return this._selectedItem; }
   get items() { return this._items; }
 
-  set selectedIndex(index: number) {
-    this._selectedIndex = index;
-    if (this.selectedItem) {
-      this._tab.setInfo(this.selectedItem.help);
-    }
-  }
-
   async cycleSelectedItem(direction: 1 | -1) {
-    this.selectedIndex += direction;
-
-    if (this.selectedIndex < 0) {
-      if (this._onNoMoreItems) {
-        await this._onNoMoreItems(direction);
+    const visibleItems = this.getVisibleItems();
+    let selectedIndex = visibleItems.indexOf(this._selectedItem);
+    if (selectedIndex < 0) {
+      // Selection  not found in visible items - select a new item
+      if (direction > 0) {
+        this.setFirstItemSelected();
       } else {
-        this.selectedIndex = this._items.length - 1;
+        // Select last
+        this.setLastItemSelected();
       }
-    } else if (this.selectedIndex >= this._items.length) {
-      if (this._onNoMoreItems) {
-        await this._onNoMoreItems(direction);
+    } else {
+      selectedIndex += direction;
+      if (selectedIndex < 0) {
+        if (this._onNoMoreItems) {
+          await this._onNoMoreItems(direction);
+        } else {
+          this.setLastItemSelected();
+        }
+      } else if (selectedIndex >= visibleItems.length) {
+        if (this._onNoMoreItems) {
+          await this._onNoMoreItems(direction);
+        } else {
+          this.setFirstItemSelected();
+        }
       } else {
-        this.selectedIndex = 0;
+        this._selectedItem = visibleItems[selectedIndex];
       }
     }
   }
 
-  _cursorToselectedItem() {
+  _cursorToSelectedItem() {
+    const visibleItems = this.getVisibleItems();
+    const selectedIndex = visibleItems.indexOf(this._selectedItem);
     let x = MENU_PREFIX.length + 3;
-    for (let i = 0; i < this.selectedIndex; i++) {
-      const item = this._items[i];
+    for (let i = 0; i < selectedIndex; i++) {
+      const item = visibleItems[i];
       x += (item.label.length + ITEM_GAP);
     }
     output.cursorTo(x + this.selectedItem.keyPosition, 1);
   }
 
-
   async handle(key: string): Promise<boolean> {
     let handled = false;
-    if (key === KEY_ENTER) {
+    if (key === KEY_ENTER && this.selectedItem) {
       // Call back this method (maybe in child class) with key
       // for active item
       handled = await this.handle(this.selectedItem.key);
@@ -185,7 +204,8 @@ export default class Menu extends ComponentBase {
           handled = true;
           break;
         default: {
-          const item = this._items.find(candidate => candidate.key === key.toUpperCase());
+          const item = this.getVisibleItems()
+            .find(candidate => candidate.key === key.toUpperCase());
           if (item) {
             if (item.execute) {
               await item.execute();

@@ -5,9 +5,16 @@ export default class MenuItem {
   _key: string
   _keyPosition: number
   _help: string
-  _execute: () => Promise<void>
+  _execute: ?() => Promise<void>
+  _checkVisible: ?() => boolean
 
-  constructor(key: string, label: string, help: string, execute?: () => Promise<void>) {
+  constructor(
+    key: string,
+    label: string,
+    help: string,
+    execute?: () => Promise<void>,
+    checkVisible?: () => boolean,
+  ) {
     this._key = key;
     this._label = label;
     this._help = help;
@@ -15,14 +22,14 @@ export default class MenuItem {
     if (this._keyPosition < 0) {
       throw new Error('Key not found in menu option label text.');
     }
-    if (execute) {
-      this._execute = execute;
-    }
+    this._execute = execute;
+    this._checkVisible = checkVisible;
   }
 
 
   // Simple getters
   get execute() { return this._execute; }
+  get checkVisible() { return this._checkVisible; }
   get key() { return this._key; }
   get keyPosition() { return this._keyPosition; }
   get label() { return this._label; }
