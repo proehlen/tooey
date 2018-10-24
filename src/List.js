@@ -97,12 +97,16 @@ export default class List<T> extends ComponentBase {
       this._onEnter = options.onEnter;
     }
     if (options.menu) {
-      // Add paging to menu
-      options.menu.addItem(new MenuItem('D', 'Page Down', 'Go to next page', this.pageDown.bind(this)));
+      // Add page down to menu
+      options.menu.addItem(new MenuItem('D', 'Page Down', 'Go to next page',
+        this.pageDown.bind(this),
+        () => !this._isLastPage()));
     }
     if (options.menu) {
-      // Add paging to menu (incorrect flow error requires section if statement)
-      options.menu.addItem(new MenuItem('U', 'Page Up', 'Return to previous page', this.pageUp.bind(this)));
+      // Add page up to menu (incorrect flow error requires above additional if statement)
+      options.menu.addItem(new MenuItem('U', 'Page Up', 'Return to previous page',
+        this.pageUp.bind(this),
+        () => this._currentPage() > 1));
     }
   }
 
