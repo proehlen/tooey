@@ -8,7 +8,7 @@ import InputView from './InputView';
 import * as keys from './keys';
 import List from './List';
 import Menu from './Menu';
-import MenuForm from './MenuForm';
+import FormView from './FormView';
 import output from './output';
 import SelectView from './SelectView';
 import Tab from './Tab';
@@ -24,7 +24,7 @@ export default {
   keys,
   List,
   Menu,
-  MenuForm,
+  FormView,
   output,
   SelectView,
   Tab,

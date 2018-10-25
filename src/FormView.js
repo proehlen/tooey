@@ -9,11 +9,11 @@ import {
   KEY_UP, KEY_DOWN,
 } from './keys';
 
-export type MenuFormOptions = {
+export type FormViewOptions = {
   readOnly?: boolean
 }
 
-export default class MenuForm extends ComponentBase {
+export default class FormView extends ComponentBase {
   _menu: Menu
   _form: Form
   _activeComponent: ComponentBase
@@ -22,7 +22,7 @@ export default class MenuForm extends ComponentBase {
     tab: Tab,
     fields: Array<FormFieldDescription>,
     menuItems: Array<MenuItem>,
-    options: MenuFormOptions = {},
+    options: FormViewOptions = {},
   ) {
     super();
 
