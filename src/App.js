@@ -5,7 +5,7 @@ import cliui from 'cliui';
 import { isInteger } from 'stringfu';
 
 import output from './output';
-import ViewBase from './ViewBase';
+import ViewBase from './view/ViewBase';
 import Tab from './Tab';
 
 declare var process: any;

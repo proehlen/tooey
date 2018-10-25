@@ -1,13 +1,13 @@
 // @flow
 
-import Tab from './Tab';
-import ComponentBase from './ComponentBase';
-import Form, { type FormFieldDescription } from './Form';
-import Menu, { type MenuItem } from './Menu';
+import Tab from '../Tab';
+import ComponentBase from '../component/ComponentBase';
+import Form, { type FormFieldDescription } from '../component/Form';
+import Menu, { type MenuItem } from '../component/Menu';
 
 import {
   KEY_UP, KEY_DOWN,
-} from './keys';
+} from '../keys';
 
 export type FormViewOptions = {
   readOnly?: boolean

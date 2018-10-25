@@ -2,11 +2,11 @@
 
 import cliui from 'cliui';
 import colors from 'colors';
-import output from './output';
+import output from '../output';
 import ViewBase from './ViewBase';
-import Input from './Input';
-import { KEY_UP, KEY_DOWN } from './keys';
-import Tab from './Tab';
+import Input from '../component/Input';
+import { KEY_UP, KEY_DOWN } from '../keys';
+import Tab from '../Tab';
 
 export type InputViewOptions = {
   instructions?: string

@@ -4,14 +4,14 @@ import colors from 'colors';
 import { rightPad } from 'stringfu';
 
 
-import Tab from './Tab';
+import Tab from '../Tab';
 import ComponentBase from './ComponentBase';
 import Menu from './Menu';
-import output from './output';
+import output from '../output';
 
 import {
   KEY_PAGE_DOWN, KEY_PAGE_UP, KEY_DOWN, KEY_UP, KEY_ENTER,
-} from './keys';
+} from '../keys';
 
 /**
  * A column to be displayed in the list.  The value function

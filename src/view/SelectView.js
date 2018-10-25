@@ -1,9 +1,9 @@
 // @flow
 
 import ViewBase from './ViewBase';
-import List, { type ListColumn } from './List';
-import Menu from './Menu';
-import Tab from './Tab';
+import List, { type ListColumn } from '../component/List';
+import Menu from '../component/Menu';
+import Tab from '../Tab';
 
 export type SelectViewItem = {
   label: string,

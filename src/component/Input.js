@@ -1,9 +1,9 @@
 // @flow
 
-import Tab from './Tab';
+import Tab from '../Tab';
 import ComponentBase from './ComponentBase';
-import output from './output';
-import { KEY_ESCAPE, KEY_ENTER, KEY_BACKSPACE } from './keys';
+import output from '../output';
+import { KEY_ESCAPE, KEY_ENTER, KEY_BACKSPACE } from '../keys';
 
 export type InputType = 'string' | 'integer' | 'password';
 

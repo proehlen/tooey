@@ -5,7 +5,7 @@ import cliui from 'cliui';
 
 import output from './output';
 import App from './App';
-import ViewBase from './ViewBase';
+import ViewBase from './view/ViewBase';
 
 declare var process: any;
 

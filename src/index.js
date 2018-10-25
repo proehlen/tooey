@@ -1,19 +1,19 @@
 // @flow
 
 import App from './App';
-import ComponentBase from './ComponentBase';
-import Form from './Form';
-import Input from './Input';
-import InputView from './InputView';
+import ComponentBase from './component/ComponentBase';
+import Form from './component/Form';
+import Input from './component/Input';
+import InputView from './view/InputView';
 import * as keys from './keys';
-import List from './List';
-import Menu from './Menu';
-import FormView from './FormView';
+import List from './component/List';
+import Menu from './component/Menu';
+import FormView from './view/FormView';
 import output from './output';
-import SelectView from './SelectView';
+import SelectView from './view/SelectView';
 import Tab from './Tab';
-import Text from './Text';
-import ViewBase from './ViewBase';
+import Text from './component/Text';
+import ViewBase from './view/ViewBase';
 
 export default {
   App,

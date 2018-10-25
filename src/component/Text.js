@@ -1,12 +1,12 @@
 // @flow
 
-import Tab from './Tab';
+import Tab from '../Tab';
 import ComponentBase from './ComponentBase';
-import output from './output';
+import output from '../output';
 
 import {
   KEY_DOWN, KEY_UP, KEY_PAGE_DOWN, KEY_PAGE_UP,
-} from './keys';
+} from '../keys';
 
 export default class List extends ComponentBase {
   _tab: Tab

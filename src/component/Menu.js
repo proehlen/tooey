@@ -3,12 +3,12 @@
 import colors from 'colors';
 import cliui from 'cliui';
 
-import Tab from './Tab';
+import Tab from '../Tab';
 import ComponentBase from './ComponentBase';
-import output from './output';
+import output from '../output';
 import {
   KEY_ENTER, KEY_ESCAPE, KEY_LEFT, KEY_RIGHT, KEY_TAB, KEY_SHIFT_TAB,
-} from './keys';
+} from '../keys';
 
 
 const ITEM_GAP = 3; // Render gap between items

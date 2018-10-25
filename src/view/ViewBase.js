@@ -1,5 +1,5 @@
 // @flow
-import ComponentBase from './ComponentBase';
+import ComponentBase from '../component/ComponentBase';
 
 export default class ViewBase extends ComponentBase {
   _title: string

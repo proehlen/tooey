@@ -1,13 +1,13 @@
 // @flow
 
 import ComponentBase from './ComponentBase';
-import Tab from './Tab';
+import Tab from '../Tab';
 import Input, { type InputType } from './Input';
-import output from './output';
+import output from '../output';
 
 import {
   KEY_TAB, KEY_SHIFT_TAB, KEY_LEFT, KEY_RIGHT, KEY_ESCAPE, KEY_UP, KEY_DOWN, KEY_ENTER,
-} from './keys';
+} from '../keys';
 
 type FormSelectionDirection = -1 | 1
 type FormOnNoMoreFields = (FormSelectionDirection) => Promise<void>
