@@ -1,13 +1,14 @@
+// @flow
+
 import App from './App';
 import ComponentBase from './ComponentBase';
 import Form from './Form';
 import Input from './Input';
 import InputHelp from './InputHelp';
-import keys from './keys';
+import * as keys from './keys';
 import List from './List';
 import Menu from './Menu';
 import MenuForm from './MenuForm';
-import MenuItem from './MenuItem';
 import output from './output';
 import SelectView from './SelectView';
 import Tab from './Tab';
@@ -24,7 +25,6 @@ export default {
   List,
   Menu,
   MenuForm,
-  MenuItem,
   output,
   SelectView,
   Tab,

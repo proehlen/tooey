@@ -5,7 +5,6 @@ import cliui from 'cliui';
 
 import Tab from './Tab';
 import ComponentBase from './ComponentBase';
-import MenuItem from './MenuItem';
 import output from './output';
 import {
   KEY_ENTER, KEY_ESCAPE, KEY_LEFT, KEY_RIGHT, KEY_TAB, KEY_SHIFT_TAB,
@@ -17,6 +16,14 @@ const MENU_PREFIX = 'Menu';
 
 type Direction = -1 | 1
 type NoMoreItemsCallback = (Direction) => Promise<void>
+
+export type MenuItem = {
+  key: string,
+  label: string,
+  help: string,
+  execute?: () => Promise<void>,
+  checkVisible?: () => boolean,
+}
 
 export default class Menu extends ComponentBase {
   _tab: Tab
@@ -40,11 +47,19 @@ export default class Menu extends ComponentBase {
     }
 
     // Every menu has to allow for quitting
-    this.addItem(new MenuItem('Q', 'Quit', 'Exit the program'));
+    this.addItem({
+      key: 'Q',
+      label: 'Quit',
+      help: 'Exit the program',
+    });
 
     // Most menus have (B)ack item
     if (allowBackItem) {
-      this.addItem(new MenuItem('B', 'Back', 'Go back to previous menu'), 'start');
+      this.addItem({
+        key: 'B',
+        label: 'Back',
+        help: 'Go back to previous menu',
+      }, 'start');
       this._hasBack = true;
     } else {
       this._hasBack = false;
@@ -78,9 +93,10 @@ export default class Menu extends ComponentBase {
     const ui = cliui();
     const text = visibleItems
       .reduce((acc, item, index) => {
+        const keyPosition = this._itemKeyPosition(item);
         const separator = index > 0 ? ` ${String.fromCharCode(183)} ` : '';
-        const preKeyText = (item.keyPosition) ? item.label.substring(0, item.keyPosition) : '';
-        const postKeyText = item.label.substr(item.keyPosition + 1);
+        const preKeyText = this._itemKeyPosition ? item.label.substring(0, keyPosition) : '';
+        const postKeyText = item.label.substr(this._itemKeyPosition(item) + 1);
         const keyText = !inactive
           ? colors.bold(item.key)
           : item.key;
@@ -92,6 +108,10 @@ export default class Menu extends ComponentBase {
     if (!inactive) {
       this._cursorToSelectedItem();
     }
+  }
+
+  _itemKeyPosition(item: MenuItem) {
+    return item.label.indexOf(item.key);
   }
 
   addItem(item: MenuItem, position: 'start' | 'end' = 'end') {
@@ -168,7 +188,8 @@ export default class Menu extends ComponentBase {
       const item = visibleItems[i];
       x += (item.label.length + ITEM_GAP);
     }
-    output.cursorTo(x + this.selectedItem.keyPosition, 1);
+    const keyPosition = this._itemKeyPosition(this.selectedItem);
+    output.cursorTo(x + keyPosition, 1);
   }
 
   async handle(key: string): Promise<boolean> {

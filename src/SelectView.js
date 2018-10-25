@@ -3,7 +3,6 @@
 import ViewBase from './ViewBase';
 import List, { type ListColumn } from './List';
 import Menu from './Menu';
-import MenuItem from './MenuItem';
 import Tab from './Tab';
 
 export type SelectViewItem = {
@@ -22,9 +21,12 @@ export default class SelectView extends ViewBase {
     this._tab = tab;
     this._items = items;
 
-    this._menu = new Menu(tab, [
-      new MenuItem('O', 'OK', 'Continue with selected item', this.onOk.bind(this)),
-    ]);
+    this._menu = new Menu(tab, [{
+      key: 'O',
+      label: 'OK',
+      help: 'Continue with selected item',
+      execute: this.onOk.bind(this),
+    }]);
 
     const longestItemLabel = items
       .reduce((oldMax, item) => {

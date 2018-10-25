@@ -7,7 +7,6 @@ import { rightPad } from 'stringfu';
 import Tab from './Tab';
 import ComponentBase from './ComponentBase';
 import Menu from './Menu';
-import MenuItem from './MenuItem';
 import output from './output';
 
 import {
@@ -98,15 +97,23 @@ export default class List<T> extends ComponentBase {
     }
     if (options.menu) {
       // Add page down to menu
-      options.menu.addItem(new MenuItem('D', 'Page Down', 'Go to next page',
-        this.pageDown.bind(this),
-        () => !this._isLastPage()));
+      options.menu.addItem({
+        key: 'D',
+        label: 'Page Down',
+        help: 'Go to next page',
+        execute: this.pageDown.bind(this),
+        checkVisible: () => !this._isLastPage(),
+      });
     }
     if (options.menu) {
       // Add page up to menu (incorrect flow error requires above additional if statement)
-      options.menu.addItem(new MenuItem('U', 'Page Up', 'Return to previous page',
-        this.pageUp.bind(this),
-        () => this._currentPage() > 1));
+      options.menu.addItem({
+        key: 'U',
+        label: 'Page Up',
+        help: 'Return to previous page',
+        execute: this.pageUp.bind(this),
+        checkVisible: () => this._currentPage() > 1,
+      });
     }
   }
 

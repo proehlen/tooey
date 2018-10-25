@@ -3,8 +3,7 @@
 import Tab from './Tab';
 import ComponentBase from './ComponentBase';
 import Form, { type FormFieldDescription } from './Form';
-import Menu from './Menu';
-import MenuItem from './MenuItem';
+import Menu, { type MenuItem } from './Menu';
 
 import {
   KEY_UP, KEY_DOWN,
