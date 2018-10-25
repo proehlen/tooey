@@ -9,11 +9,11 @@ export type InputType = 'string' | 'integer' | 'password';
 
 export default class Input extends ComponentBase {
   _value: string
-  _onEnter: () => Promise<void>
+  _onEnter: (string) => Promise<void>
   _type: InputType
   _tab: Tab
 
-  constructor(tab: Tab, onEnter: () => Promise<void>, initialValue: string = '', type: InputType = 'string') {
+  constructor(tab: Tab, onEnter: (string) => Promise<void>, initialValue: string = '', type: InputType = 'string') {
     super();
     this._tab = tab;
     this._onEnter = onEnter;
@@ -85,7 +85,7 @@ export default class Input extends ComponentBase {
         handled = true;
         break;
       case KEY_ENTER:
-        await this._onEnter();
+        await this._onEnter(this._value);
         handled = true;
         break;
       case KEY_ESCAPE:

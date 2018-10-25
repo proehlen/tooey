@@ -4,7 +4,7 @@ import App from './App';
 import ComponentBase from './ComponentBase';
 import Form from './Form';
 import Input from './Input';
-import InputHelp from './InputHelp';
+import InputView from './InputView';
 import * as keys from './keys';
 import List from './List';
 import Menu from './Menu';
@@ -20,7 +20,7 @@ export default {
   ComponentBase,
   Form,
   Input,
-  InputHelp,
+  InputView,
   keys,
   List,
   Menu,
