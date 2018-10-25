@@ -10,6 +10,10 @@ export type SelectViewItem = {
   execute?: () => Promise<void>,
 }
 
+/**
+ * A SelectView is a view with a single column list, each row executing a
+ * different action when the user presses Enter with the row selected.
+ */
 export default class SelectView extends ViewBase {
   _tab: Tab
   _items: Array<SelectViewItem>
@@ -65,18 +69,18 @@ export default class SelectView extends ViewBase {
   }
 
   async onOk() {
-    this.onListEnter(this._list.selectedRowIndex);
+    await this.onListEnter(this._list.selectedRowIndex);
   }
 
-  render(inactive: boolean) {
+  render() {
     this._list.render();
-    this._menu.render(inactive);
+    this._menu.render(false);
   }
 
   async handle(key: string): Promise<boolean> {
     let handled = await this._menu.handle(key);
     if (!handled) {
-      handled = this._list.handle(key);
+      handled = await this._list.handle(key);
     }
     return handled;
   }
