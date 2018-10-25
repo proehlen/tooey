@@ -102,7 +102,7 @@ export default class List<T> extends ComponentBase {
         label: 'Page Down',
         help: 'Go to next page',
         execute: this.pageDown.bind(this),
-        checkVisible: () => !this._isLastPage(),
+        visible: () => !this._isLastPage(),
       });
     }
     if (options.menu) {
@@ -112,7 +112,7 @@ export default class List<T> extends ComponentBase {
         label: 'Page Up',
         help: 'Return to previous page',
         execute: this.pageUp.bind(this),
-        checkVisible: () => this._currentPage() > 1,
+        visible: () => this._currentPage() > 1,
       });
     }
   }

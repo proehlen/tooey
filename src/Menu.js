@@ -22,7 +22,7 @@ export type MenuItem = {
   label: string,
   help: string,
   execute?: () => Promise<void>,
-  checkVisible?: () => boolean,
+  visible?: () => boolean,
 }
 
 export default class Menu extends ComponentBase {
@@ -74,7 +74,7 @@ export default class Menu extends ComponentBase {
 
   getVisibleItems(): MenuItem[] {
     return this._items
-      .filter(item => !item.checkVisible || item.checkVisible());
+      .filter(item => !item.visible || item.visible());
   }
 
   render(inactive: boolean) {
