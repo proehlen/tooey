@@ -14,9 +14,32 @@ import {
 const ITEM_GAP = 3; // Render gap between items
 const MENU_PREFIX = 'Menu';
 
-type Direction = -1 | 1
-type NoMoreItemsCallback = (Direction) => Promise<void>
+/**
+ * The direction of user selection in a {@link Menu}
+ *
+ * A negative value indicates backwards, a positive value indicates forwards
+ */
+type MenuSelectionDirection = -1 | 1
 
+/**
+ * A function to be called by the {@link Menu} when there are no more items in
+ * the direction the user was navigating.
+ *
+ * This may be useful in parent views where you wish the user to navigate
+ * between components such a Form and a Menu
+ */
+type MenuOnNoMoreItems = (MenuSelectionDirection) => Promise<void>
+
+/**
+ * An item in a {@link Menu}
+ *
+ * Each item has:
+ * * a key (a single character in the alphabet which is a short cut)
+ * * a label that appears in the menu
+ * * help text that is rendered in the status bar
+ * * an `execute` function to be called when the user chooses the item
+ * * an optional functon to be called to dynamically determine the item's visibility
+ */
 export type MenuItem = {
   key: string,
   label: string,
@@ -25,18 +48,21 @@ export type MenuItem = {
   visible?: () => boolean,
 }
 
+/**
+ * A menu is a horizontal row of {@link MenuItem items} from which the user can choose
+ */
 export default class Menu extends ComponentBase {
   _tab: Tab
   _items: MenuItem[]
   _selectedItem: MenuItem
   _hasBack: boolean
-  _onNoMoreItems: NoMoreItemsCallback
+  _onNoMoreItems: MenuOnNoMoreItems
 
   constructor(
     tab: Tab,
     items?: MenuItem[] = [],
     allowBackItem: boolean = true,
-    onNoMoreItems?: NoMoreItemsCallback,
+    onNoMoreItems?: MenuOnNoMoreItems,
   ) {
     super();
 
@@ -72,11 +98,19 @@ export default class Menu extends ComponentBase {
     this.setFirstItemSelected();
   }
 
+  /**
+   * Return currently visible items in the {@link Menu}
+   */
   getVisibleItems(): MenuItem[] {
     return this._items
       .filter(item => !item.visible || item.visible());
   }
 
+  /**
+   * Render the {@link Menu} to the console.
+   *
+   * Menus are always rendered at a fixed line at the top of the console.
+   */
   render(inactive: boolean) {
     // After processing, some menu items may no longer be visible (dynamically hidden) including
     // the one that was previously selected. Ensure a menu item is still selected
@@ -90,7 +124,7 @@ export default class Menu extends ComponentBase {
 
     // Build items text
     output.cursorTo(0, output.menuRow);
-    const ui = cliui();
+    const ui = cliui({ wrap: false, width: output.width });
     const text = visibleItems
       .reduce((acc, item, index) => {
         const keyPosition = this._itemKeyPosition(item);
@@ -114,6 +148,9 @@ export default class Menu extends ComponentBase {
     return item.label.indexOf(item.key);
   }
 
+  /**
+   * Add a single item to a {@link Menu}
+   */
   addItem(item: MenuItem, position: 'start' | 'end' = 'end') {
     if (this._items.findIndex(existing => existing.key === item.key) > -1) {
       throw new Error(`Cannot create menu with duplicate key '${item.key}'`);
@@ -129,6 +166,9 @@ export default class Menu extends ComponentBase {
     }
   }
 
+  /**
+   * Set which item is currently selected in the {@link Menu}
+   */
   setSelectedItem(item: MenuItem) {
     this._selectedItem = item;
     if (item) {
@@ -136,20 +176,44 @@ export default class Menu extends ComponentBase {
     }
   }
 
+  /**
+   * Set the first {@link MenuItem item} in the {@link Menu} to selected
+   */
   setFirstItemSelected() {
     const visibleItems = this.getVisibleItems();
     this.setSelectedItem(visibleItems[0]);
   }
 
+  /**
+   * Set the last {@link MenuItem item} in the {@link Menu} to selected
+   */
   setLastItemSelected() {
     const visibleItems = this.getVisibleItems();
     this.setSelectedItem(visibleItems[visibleItems.length - 1]);
   }
 
+  /**
+   * The currently selected item in the {@link Menu}
+   *
+   * Selected items are rendered as highlighed in some way and are
+   * usually executed when the user presses Enter.  This is in contrast to
+   * non-selected items can only be executed by pressing the `key`.
+   */
   get selectedItem() { return this._selectedItem; }
+
+  /**
+   * Return all items in the {@link Menu}
+   *
+   * Note: not all of these items may be visible to the user.  Call `getVisibleItems`
+   * if you only want visible items.
+   */
   get items() { return this._items; }
 
-  async cycleSelectedItem(direction: 1 | -1) {
+  /**
+   * Faciliate backward or forward navigation between items on the {@link Menu}
+   * @private
+   */
+  async _cycleSelectedItem(direction: 1 | -1) {
     const visibleItems = this.getVisibleItems();
     let selectedIndex = visibleItems.indexOf(this._selectedItem);
     if (selectedIndex < 0) {
@@ -192,6 +256,9 @@ export default class Menu extends ComponentBase {
     output.cursorTo(x + keyPosition, 1);
   }
 
+  /**
+   * Handle user input to the {@link Menu}
+   */
   async handle(key: string): Promise<boolean> {
     let handled = false;
     if (key === KEY_ENTER && this.selectedItem) {
@@ -208,12 +275,12 @@ export default class Menu extends ComponentBase {
           break;
         case KEY_LEFT:
         case KEY_SHIFT_TAB:
-          await this.cycleSelectedItem(-1);
+          await this._cycleSelectedItem(-1);
           handled = true;
           break;
         case KEY_RIGHT:
         case KEY_TAB:
-          await this.cycleSelectedItem(1);
+          await this._cycleSelectedItem(1);
           handled = true;
           break;
         case 'B':

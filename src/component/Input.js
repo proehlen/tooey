@@ -5,8 +5,14 @@ import ComponentBase from './ComponentBase';
 import output from '../output';
 import { KEY_ESCAPE, KEY_ENTER, KEY_BACKSPACE } from '../keys';
 
+/**
+ * The type of input that should be accepted or be represented by the {@link Input} component
+ */
 export type InputType = 'string' | 'integer' | 'password';
 
+/**
+ * A component for accepting user input
+ */
 export default class Input extends ComponentBase {
   _value: string
   _onEnter: (string) => Promise<void>
@@ -21,9 +27,15 @@ export default class Input extends ComponentBase {
     this._type = type;
   }
 
+  /**
+   * The current value of the {@link Input}
+   */
   get value() { return this._value; }
   set value(value: string) { this._value = value; }
 
+  /**
+   * Render the {@link Input} to the console
+   */
   render(
     inactive: boolean = false,
     atColumn: number = 0,
@@ -77,6 +89,9 @@ export default class Input extends ComponentBase {
     }
   }
 
+  /**
+   * Handle user input to the {@link Input} component
+   */
   async handle(key: string): Promise<boolean> {
     let handled = false;
     switch (key) {

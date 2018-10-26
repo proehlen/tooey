@@ -14,10 +14,10 @@ import {
 } from '../keys';
 
 /**
- * A column to be displayed in the list.  The value function
- * recieves a row in the data (an object) and the row index
- * and returns the value to be output as a string in that
- * column.
+ * A column to be displayed in a {@link List}.
+ *
+ * The value function recieves a row in the data (an object) and the row index
+ * and returns the value to be output as a string in that column.
  */
 export type ListColumn<T> = {
   heading: string,
@@ -28,25 +28,25 @@ export type ListColumn<T> = {
 type OutputRow = Array<string>
 
 /**
- * Data to display in the list - an array of objects.
+ * Data to display in a {@link List} - an array of objects.
  */
 export type ListData<T> = Array<T>
 
 /**
  * Callback function to be called when the user navigates to
- * a different row in the list (ie via up/down arrows).  Requires
- * List to be constructed with rowSelection === true.
+ * a different row in a {@link List} (ie via up/down arrows).  Requires
+ * List to be constructed with `rowSelection` set to `true`.
  */
 export type ListOnSelect = () => Promise<void>
 
 /**
  * Callback function to be called when the user presses Enter
- * on a list row.
+ * on a {@link List} row.
  */
 export type ListOnEnter = (number) => Promise<void>
 
 /**
- * List options
+ * {@link List} options
  */
 export type ListOptions = {
   showHeadings?: boolean,
@@ -55,7 +55,6 @@ export type ListOptions = {
   onSelect?: ListOnSelect,
   onEnter?: ListOnEnter,
 }
-
 
 /**
  * A multi-column List component with optional row selection
@@ -118,7 +117,7 @@ export default class List<T> extends ComponentBase {
   }
 
   /**
-   * Updates the data shown in the list
+   * Updates the data shown in a {@link List}
    */
   setData(data: ListData<T>) {
     this._data = data;
@@ -136,7 +135,7 @@ export default class List<T> extends ComponentBase {
   }
 
   /**
-   * Renders this component
+   * Renders the {@link List}
    */
   render() {
     // Column headings
@@ -172,7 +171,7 @@ export default class List<T> extends ComponentBase {
   }
 
   /**
-   * Changes the currently displayed data to the previous page
+   * Changes the currently displayed data in a {@link List} to the previous page
    */
   async pageUp(): Promise<void> {
     if (this._startIndex === 0) {
@@ -191,7 +190,7 @@ export default class List<T> extends ComponentBase {
   }
 
   /**
-   * Return the index of the currently selected row
+   * Return the index of the currently selected row in a {@link List}
    */
   get selectedRowIndex(): number {
     return this._startIndex + this._selectedPageRow;
@@ -210,7 +209,7 @@ export default class List<T> extends ComponentBase {
   }
 
   /**
-   * Changes the currently displayed data to the next page
+   * Changes the currently displayed data in a {@link List} to the next page
    */
   async pageDown(): Promise<void> {
     if ((this._startIndex + output.contentHeight) > this._data.length) {
@@ -228,7 +227,7 @@ export default class List<T> extends ComponentBase {
   }
 
   /**
-   * Selects the previous record (pages up if necessary)
+   * Selects the previous record in a {@link List} (paging up if necessary)
    */
   async selectPrevious(): Promise<void> {
     if (this._selectedPageRow === 0) {
@@ -242,7 +241,7 @@ export default class List<T> extends ComponentBase {
   }
 
   /**
-   * Selects the next record (pages down if necessary)
+   * Selects the next record in a {@link List} (paging down if necessary)
    */
   async selectNext(): Promise<void> {
     const isLastPage = this._isLastPage();
@@ -262,7 +261,7 @@ export default class List<T> extends ComponentBase {
   }
 
   /**
-   * Handle user input
+   * Handle user input to a {@link List}
    */
   async handle(key: string): Promise<boolean> {
     let handled = false;
