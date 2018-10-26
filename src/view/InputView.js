@@ -12,8 +12,22 @@ export type InputViewOptions = {
   instructions?: string
 }
 
+/**
+ * The title for the {@link InputView}
+ */
 type InputViewTitle = string;
+
+/**
+ * An single historical input for a {@link InputView}
+ */
 type InputViewHistory = string[];
+
+/**
+ * A map of all history for all {@link InputView} instances.
+ *
+ * Map is keyed by title of the InputView so use unique titles if you
+ * which history to be different for different instances.
+ */
 type InputViewAllHistory = Map<InputViewTitle, InputViewHistory>;
 
 const allHistory: InputViewAllHistory = new Map();
@@ -51,6 +65,9 @@ export default class InputView extends ViewBase {
     this._onEnter = onEnter;
   }
 
+  /**
+   * Render the {@link InputView}
+   */
   render() {
     // Render instruction text somewhere below the input field but only if no input has been entered
     // since the input may wrap and overwrite this text otherwise
@@ -126,6 +143,9 @@ export default class InputView extends ViewBase {
     this._input.value = this._history[index];
   }
 
+  /**
+   * Handle input to the {@link InputView}
+   */
   async handle(key: string): Promise<boolean> {
     let handled = false;
     switch (key) {

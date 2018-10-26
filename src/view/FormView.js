@@ -9,10 +9,16 @@ import {
   KEY_UP, KEY_DOWN,
 } from '../keys';
 
+/**
+ * Options for constructing a {@link FormView}
+ */
 export type FormViewOptions = {
   readOnly?: boolean
 }
 
+/**
+ * A FormView is a view providing a {@link Form} and {@link Menu}
+ */
 export default class FormView extends ComponentBase {
   _menu: Menu
   _form: Form
@@ -30,24 +36,35 @@ export default class FormView extends ComponentBase {
     this._form = new Form(
       tab,
       fields, {
-        onNoMoreFields: this.onNoMoreFields.bind(this),
-        onEscape: this.onEscapeFromField.bind(this),
+        onNoMoreFields: this._onNoMoreFields.bind(this),
+        onEscape: this._onEscapeFromField.bind(this),
         readOnly: options.readOnly,
       },
     );
 
     // Create menu
-    this._menu = new Menu(tab, menuItems, true, this.onNoMoreOptions.bind(this));
+    this._menu = new Menu(tab, menuItems, true, this._onNoMoreOptions.bind(this));
 
     // Start with menu active
     this._activeComponent = this._menu;
   }
 
+  /**
+   * The menu for the {@link FormView}
+   */
   get menu() { return this._menu; }
+
+  /**
+   * The form for the {@link FormView}
+   */
   get form() { return this._form; }
+
+  /**
+   * The fields on the {@link FormView}
+   */
   get fields() { return this._form.fields; }
 
-  async onNoMoreOptions(direction: number) {
+  async _onNoMoreOptions(direction: number) {
     this._activeComponent = this._form;
     if (direction > 0) {
       this._form.setFirstFieldSelected();
@@ -56,7 +73,7 @@ export default class FormView extends ComponentBase {
     }
   }
 
-  async onNoMoreFields(direction: number) {
+  async _onNoMoreFields(direction: number) {
     this._activeComponent = this._menu;
     if (direction > 0) {
       this._menu.setFirstItemSelected();
@@ -65,10 +82,13 @@ export default class FormView extends ComponentBase {
     }
   }
 
-  async onEscapeFromField() {
+  async _onEscapeFromField() {
     this._activeComponent = this._menu;
   }
 
+  /**
+   * Handle input to the {@link FormView}
+   */
   async handle(key: string): Promise<boolean> {
     let handled = false;
     if ((key === KEY_DOWN || key === KEY_UP) && this._activeComponent === this._menu) {
@@ -83,6 +103,9 @@ export default class FormView extends ComponentBase {
     return handled;
   }
 
+  /**
+   * Render the {@link FormView}
+   */
   render() {
     // Render components in proper order for cursor positioning
     if (this._activeComponent === this._menu) {
