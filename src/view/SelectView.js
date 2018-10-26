@@ -5,6 +5,9 @@ import List, { type ListColumn } from '../component/List';
 import Menu from '../component/Menu';
 import Tab from '../Tab';
 
+/**
+ * An item that can be selected in a {@link SelectView}
+ */
 export type SelectViewItem = {
   label: string,
   execute?: () => Promise<void>,
@@ -29,7 +32,7 @@ export default class SelectView extends ViewBase {
       key: 'O',
       label: 'OK',
       help: 'Continue with selected item',
-      execute: this.onOk.bind(this),
+      execute: this._onOk.bind(this),
     }]);
 
     const longestItemLabel = items
@@ -54,12 +57,12 @@ export default class SelectView extends ViewBase {
     this._list = new List(tab, columns, items, {
       menu: this._menu,
       rowSelection: true,
-      onEnter: this.onListEnter.bind(this),
+      onEnter: this._onListEnter.bind(this),
       showHeadings: false,
     });
   }
 
-  async onListEnter(listIndex: number) {
+  async _onListEnter(listIndex: number) {
     const item = this._items[listIndex];
     if (item.execute) {
       await item.execute();
@@ -68,15 +71,21 @@ export default class SelectView extends ViewBase {
     }
   }
 
-  async onOk() {
-    await this.onListEnter(this._list.selectedRowIndex);
+  async _onOk() {
+    await this._onListEnter(this._list.selectedRowIndex);
   }
 
+  /**
+   * Render the {@link SelectView}
+   */
   render() {
     this._list.render();
     this._menu.render(false);
   }
 
+  /**
+   * Handle input to the {@link SelectView}
+   */
   async handle(key: string): Promise<boolean> {
     let handled = await this._menu.handle(key);
     if (!handled) {
