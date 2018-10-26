@@ -100,7 +100,7 @@ export default class List<T> extends ComponentBase {
         key: 'D',
         label: 'Page Down',
         help: 'Go to next page',
-        execute: this.pageDown.bind(this),
+        execute: this._pageDown.bind(this),
         visible: () => !this._isLastPage(),
       });
     }
@@ -110,7 +110,7 @@ export default class List<T> extends ComponentBase {
         key: 'U',
         label: 'Page Up',
         help: 'Return to previous page',
-        execute: this.pageUp.bind(this),
+        execute: this._pageUp.bind(this),
         visible: () => this._currentPage() > 1,
       });
     }
@@ -172,8 +172,9 @@ export default class List<T> extends ComponentBase {
 
   /**
    * Changes the currently displayed data in a {@link List} to the previous page
+   * @private
    */
-  async pageUp(): Promise<void> {
+  async _pageUp(): Promise<void> {
     if (this._startIndex === 0) {
       this._tab.setInfo('Already at start');
       return;
@@ -210,8 +211,9 @@ export default class List<T> extends ComponentBase {
 
   /**
    * Changes the currently displayed data in a {@link List} to the next page
+   * @private
    */
-  async pageDown(): Promise<void> {
+  async _pageDown(): Promise<void> {
     if ((this._startIndex + output.contentHeight) > this._data.length) {
       this._tab.setInfo('No more pages');
       return;
@@ -231,7 +233,7 @@ export default class List<T> extends ComponentBase {
    */
   async selectPrevious(): Promise<void> {
     if (this._selectedPageRow === 0) {
-      await this.pageUp();
+      await this._pageUp();
     } else {
       this._selectedPageRow--;
     }
@@ -247,7 +249,7 @@ export default class List<T> extends ComponentBase {
     const isLastPage = this._isLastPage();
     const lastPageRowIndex = (this._data.length % output.contentHeight) - 1;
     if (!isLastPage && this._selectedPageRow >= output.contentHeight - 1) {
-      await this.pageDown();
+      await this._pageDown();
     } else if (isLastPage && this._selectedPageRow < lastPageRowIndex) {
       this._selectedPageRow++;
     } else if (!isLastPage) {
@@ -276,7 +278,7 @@ export default class List<T> extends ComponentBase {
         if (this._rowSelection) {
           await this.selectNext();
         } else {
-          await this.pageDown();
+          await this._pageDown();
         }
         handled = true;
         break;
@@ -284,16 +286,16 @@ export default class List<T> extends ComponentBase {
         if (this._rowSelection) {
           await this.selectPrevious();
         } else {
-          await this.pageUp();
+          await this._pageUp();
         }
         handled = true;
         break;
       case KEY_PAGE_DOWN:
-        await this.pageDown();
+        await this._pageDown();
         handled = true;
         break;
       case KEY_PAGE_UP:
-        await this.pageUp();
+        await this._pageUp();
         handled = true;
         break;
       default:

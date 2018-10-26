@@ -8,7 +8,10 @@ import {
   KEY_DOWN, KEY_UP, KEY_PAGE_DOWN, KEY_PAGE_UP,
 } from '../keys';
 
-export default class List extends ComponentBase {
+/**
+ * A component for displaying multi-line text with paging
+ */
+export default class Text extends ComponentBase {
   _tab: Tab
   _text: string
   _page: number
@@ -23,6 +26,9 @@ export default class List extends ComponentBase {
     this._page = 1;
   }
 
+  /**
+   * Renders the text for the current page
+   */
   render() {
     // Render text for current page
     const startAt = (this._page - 1) * this._numCharsPage;
@@ -31,7 +37,7 @@ export default class List extends ComponentBase {
     console.log(pageText);
   }
 
-  async pageUp() {
+  async _pageUp() {
     if (this._page === 1) {
       this._tab.setInfo('Already at start');
       return;
@@ -47,7 +53,7 @@ export default class List extends ComponentBase {
     return Math.ceil(this._text.length / this._numCharsPage);
   }
 
-  async pageDown() {
+  async _pageDown() {
     if (this._page >= this._pageCount) {
       this._tab.setInfo('No more pages');
       return;
@@ -55,17 +61,23 @@ export default class List extends ComponentBase {
     this._page++;
   }
 
+  /**
+   * Handles input for the {@link Text}
+   *
+   * Note: the text itself is read-only and the only input we handle is for paging up
+   * and down.
+   */
   async handle(key: string): Promise<boolean> {
     let handled = false;
     switch (key) {
       case KEY_DOWN:
       case KEY_PAGE_DOWN:
-        await this.pageDown();
+        await this._pageDown();
         handled = true;
         break;
       case KEY_UP:
       case KEY_PAGE_UP:
-        await this.pageUp();
+        await this._pageUp();
         handled = true;
         break;
       default:
