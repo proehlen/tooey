@@ -62,7 +62,7 @@ export default class SelectView extends ViewBase {
     });
   }
 
-  async _onListEnter(listIndex: number) {
+  async _onListEnter(listIndex: number): Promise<void> {
     const item = this._items[listIndex];
     if (item.execute) {
       await item.execute();
@@ -71,14 +71,14 @@ export default class SelectView extends ViewBase {
     }
   }
 
-  async _onOk() {
+  async _onOk(): Promise<void> {
     await this._onListEnter(this._list.selectedRowIndex);
   }
 
   /**
    * Render the {@link SelectView}
    */
-  render() {
+  render(): void {
     this._list.render();
     this._menu.render(false);
   }

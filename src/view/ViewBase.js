@@ -19,7 +19,7 @@ export default class ViewBase extends ComponentBase {
   /**
    * The {@link ViewBase view}'s title.
    */
-  get title() {
+  get title(): string {
     return this._title;
   }
 }

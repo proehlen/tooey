@@ -111,7 +111,7 @@ export default class Menu extends ComponentBase {
    *
    * Menus are always rendered at a fixed line at the top of the console.
    */
-  render(inactive: boolean) {
+  render(inactive: boolean): void {
     // After processing, some menu items may no longer be visible (dynamically hidden) including
     // the one that was previously selected. Ensure a menu item is still selected
     const visibleItems = this.getVisibleItems();
@@ -144,14 +144,14 @@ export default class Menu extends ComponentBase {
     }
   }
 
-  _itemKeyPosition(item: MenuItem) {
+  _itemKeyPosition(item: MenuItem): number {
     return item.label.indexOf(item.key);
   }
 
   /**
    * Add a single item to a {@link Menu}
    */
-  addItem(item: MenuItem, position: 'start' | 'end' = 'end') {
+  addItem(item: MenuItem, position: 'start' | 'end' = 'end'): void {
     if (this._items.findIndex(existing => existing.key === item.key) > -1) {
       throw new Error(`Cannot create menu with duplicate key '${item.key}'`);
     }
@@ -169,7 +169,7 @@ export default class Menu extends ComponentBase {
   /**
    * Set which item is currently selected in the {@link Menu}
    */
-  setSelectedItem(item: MenuItem) {
+  setSelectedItem(item: MenuItem): void {
     this._selectedItem = item;
     if (item) {
       this._tab.setInfo(item.help);
@@ -179,7 +179,7 @@ export default class Menu extends ComponentBase {
   /**
    * Set the first {@link MenuItem item} in the {@link Menu} to selected
    */
-  setFirstItemSelected() {
+  setFirstItemSelected(): void {
     const visibleItems = this.getVisibleItems();
     this.setSelectedItem(visibleItems[0]);
   }
@@ -187,7 +187,7 @@ export default class Menu extends ComponentBase {
   /**
    * Set the last {@link MenuItem item} in the {@link Menu} to selected
    */
-  setLastItemSelected() {
+  setLastItemSelected(): void {
     const visibleItems = this.getVisibleItems();
     this.setSelectedItem(visibleItems[visibleItems.length - 1]);
   }
@@ -199,7 +199,7 @@ export default class Menu extends ComponentBase {
    * usually executed when the user presses Enter.  This is in contrast to
    * non-selected items can only be executed by pressing the `key`.
    */
-  get selectedItem() { return this._selectedItem; }
+  get selectedItem(): MenuItem { return this._selectedItem; }
 
   /**
    * Return all items in the {@link Menu}
@@ -207,13 +207,13 @@ export default class Menu extends ComponentBase {
    * Note: not all of these items may be visible to the user.  Call `getVisibleItems`
    * if you only want visible items.
    */
-  get items() { return this._items; }
+  get items(): MenuItem[] { return this._items; }
 
   /**
    * Faciliate backward or forward navigation between items on the {@link Menu}
    * @private
    */
-  async _cycleSelectedItem(direction: 1 | -1) {
+  async _cycleSelectedItem(direction: 1 | -1): Promise<void> {
     const visibleItems = this.getVisibleItems();
     let selectedIndex = visibleItems.indexOf(this._selectedItem);
     if (selectedIndex < 0) {
@@ -244,7 +244,7 @@ export default class Menu extends ComponentBase {
     }
   }
 
-  _cursorToSelectedItem() {
+  _cursorToSelectedItem(): void {
     const visibleItems = this.getVisibleItems();
     const selectedIndex = visibleItems.indexOf(this._selectedItem);
     let x = MENU_PREFIX.length + 3;

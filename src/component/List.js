@@ -119,7 +119,7 @@ export default class List<T> extends ComponentBase {
   /**
    * Updates the data shown in a {@link List}
    */
-  setData(data: ListData<T>) {
+  setData(data: ListData<T>): void {
     this._data = data;
     this._startIndex = 0;
     this._selectedPageRow = 0;
@@ -137,7 +137,7 @@ export default class List<T> extends ComponentBase {
   /**
    * Renders the {@link List}
    */
-  render() {
+  render(): void {
     // Column headings
     if (this._showHeadings) {
       output.cursorTo(0, output.contentStartRow - 1);
@@ -230,8 +230,9 @@ export default class List<T> extends ComponentBase {
 
   /**
    * Selects the previous record in a {@link List} (paging up if necessary)
+   * @private
    */
-  async selectPrevious(): Promise<void> {
+  async _selectPrevious(): Promise<void> {
     if (this._selectedPageRow === 0) {
       await this._pageUp();
     } else {
@@ -244,8 +245,9 @@ export default class List<T> extends ComponentBase {
 
   /**
    * Selects the next record in a {@link List} (paging down if necessary)
+   * @private
    */
-  async selectNext(): Promise<void> {
+  async _selectNext(): Promise<void> {
     const isLastPage = this._isLastPage();
     const lastPageRowIndex = (this._data.length % output.contentHeight) - 1;
     if (!isLastPage && this._selectedPageRow >= output.contentHeight - 1) {
@@ -276,7 +278,7 @@ export default class List<T> extends ComponentBase {
         break;
       case KEY_DOWN:
         if (this._rowSelection) {
-          await this.selectNext();
+          await this._selectNext();
         } else {
           await this._pageDown();
         }
@@ -284,7 +286,7 @@ export default class List<T> extends ComponentBase {
         break;
       case KEY_UP:
         if (this._rowSelection) {
-          await this.selectPrevious();
+          await this._selectPrevious();
         } else {
           await this._pageUp();
         }

@@ -20,7 +20,7 @@ export default class ComponentBase {
    * that is inactive while a user's input is being directed to
    * an input field may not have bolded short cut keys.
    */
-  render(inactive: boolean) {
+  render(inactive: boolean): void {
     throw new Error('Method is abstract.  Override in subclass.');
   }
 

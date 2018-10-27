@@ -2,7 +2,7 @@
 
 import Tab from '../Tab';
 import ComponentBase from '../component/ComponentBase';
-import Form, { type FormFieldDescription } from '../component/Form';
+import Form, { type FormFieldDescription, type FormField } from '../component/Form';
 import Menu, { type MenuItem } from '../component/Menu';
 
 import {
@@ -52,19 +52,19 @@ export default class FormView extends ComponentBase {
   /**
    * The menu for the {@link FormView}
    */
-  get menu() { return this._menu; }
+  get menu(): Menu { return this._menu; }
 
   /**
    * The form for the {@link FormView}
    */
-  get form() { return this._form; }
+  get form(): Form { return this._form; }
 
   /**
    * The fields on the {@link FormView}
    */
-  get fields() { return this._form.fields; }
+  get fields(): FormField[] { return this._form.fields; }
 
-  async _onNoMoreOptions(direction: number) {
+  async _onNoMoreOptions(direction: number): Promise<void> {
     this._activeComponent = this._form;
     if (direction > 0) {
       this._form.setFirstFieldSelected();
@@ -73,7 +73,7 @@ export default class FormView extends ComponentBase {
     }
   }
 
-  async _onNoMoreFields(direction: number) {
+  async _onNoMoreFields(direction: number): Promise<void> {
     this._activeComponent = this._menu;
     if (direction > 0) {
       this._menu.setFirstItemSelected();
@@ -82,7 +82,7 @@ export default class FormView extends ComponentBase {
     }
   }
 
-  async _onEscapeFromField() {
+  async _onEscapeFromField(): Promise<void> {
     this._activeComponent = this._menu;
   }
 
@@ -106,7 +106,7 @@ export default class FormView extends ComponentBase {
   /**
    * Render the {@link FormView}
    */
-  render() {
+  render(): void {
     // Render components in proper order for cursor positioning
     if (this._activeComponent === this._menu) {
       this._form.render();

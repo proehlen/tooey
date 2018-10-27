@@ -87,7 +87,7 @@ export default class Form extends ComponentBase {
     this._onEscape = options.onEscape;
   }
 
-  async _onEnter() {
+  async _onEnter(): Promise<void> {
     this._cycleSelectedField(1);
   }
 
@@ -112,14 +112,14 @@ export default class Form extends ComponentBase {
   /**
    * Set the first {@link FormField} on the {@link Form} to be the selected one
    */
-  setFirstFieldSelected() {
+  setFirstFieldSelected(): void {
     this._selectedFieldIndex = 0;
   }
 
   /**
    * Set the last {@link FormField} on the {@link Form} to be the selected one
    */
-  setLastFieldSelected() {
+  setLastFieldSelected(): void {
     this._selectedFieldIndex = this._fields.length - 1;
   }
 
@@ -127,7 +127,7 @@ export default class Form extends ComponentBase {
    * Faciliate backward or forward navigation between fields on the {@link Form}
    * @private
    */
-  _cycleSelectedField(direction: FormSelectionDirection) {
+  _cycleSelectedField(direction: FormSelectionDirection): void {
     if (this._selectedFieldIndex === undefined) {
       // No current field selected
       if (direction === 1) {
@@ -195,7 +195,7 @@ export default class Form extends ComponentBase {
     return handled;
   }
 
-  _renderField(index: number, active: boolean) {
+  _renderField(index: number, active: boolean): void {
     const row = output.contentStartRow + index;
     output.cursorTo(0, row);
     const field = this._fields[index];
@@ -208,7 +208,7 @@ export default class Form extends ComponentBase {
   /**
    * Render the {@link Form}
    */
-  render() {
+  render(): void {
     // Render inactive fields first
     for (let i = 0; i < this._fields.length; ++i) {
       const active = (i === this._selectedFieldIndex);

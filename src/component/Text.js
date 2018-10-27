@@ -29,7 +29,7 @@ export default class Text extends ComponentBase {
   /**
    * Renders the text for the current page
    */
-  render() {
+  render(): void {
     // Render text for current page
     const startAt = (this._page - 1) * this._numCharsPage;
     const pageText = this._text.substr(startAt, this._numCharsPage);
@@ -37,7 +37,7 @@ export default class Text extends ComponentBase {
     console.log(pageText);
   }
 
-  async _pageUp() {
+  async _pageUp(): Promise<void> {
     if (this._page === 1) {
       this._tab.setInfo('Already at start');
       return;
@@ -45,15 +45,15 @@ export default class Text extends ComponentBase {
     this._page--;
   }
 
-  get _numCharsPage() {
+  get _numCharsPage(): number {
     return output.width * output.contentHeight;
   }
 
-  get _pageCount() {
+  get _pageCount(): number {
     return Math.ceil(this._text.length / this._numCharsPage);
   }
 
-  async _pageDown() {
+  async _pageDown(): Promise<void> {
     if (this._page >= this._pageCount) {
       this._tab.setInfo('No more pages');
       return;

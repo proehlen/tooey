@@ -13,6 +13,24 @@ declare var process: any;
 const TABS_PREFIX = 'Tab';
 const MAX_TABS = 3;
 
+/**
+ * The top level container for your Tooey app
+ *
+ * Each application must have exactly one App instance.  It is responsible
+ * for:
+ *   * The main / top level render routine and rendering everything that should
+ *     be currently visible.
+ *   * The main / top level handle routine and handling all user input.
+ *   * Specifically, rendering the app bar - the first row in the console, including:
+ *       * The current view title,
+ *       * the app title,
+ *       * all tabs and hot keys for opening / closing tabs
+ *   * Managing tabs.
+ *
+ * When constructing an App instance, it is necessary to provide the app title and
+ * the first view that will be rendered (the app will create the first tab to contain
+ * that view).
+ */
 export default class App {
   _title: string
   _tabs: Tab[]
@@ -24,6 +42,25 @@ export default class App {
     this._initialView = initialView;
     this._tabs = [];
     this._addTab();
+
+    // Render
+    this.render();
+
+    // Re-render on window resize
+    process.stdout.on('resize', () => {
+      output.resize();
+      this.render();
+    });
+
+    // Handle input and re-render after input
+    const { stdin } = process;
+    // $flow-disable-line need raw mode; method appears to be available
+    stdin.setRawMode(true);
+    stdin.setEncoding('utf8');
+    stdin.on('data', async (key) => {
+      await this.handle(key);
+      this.render();
+    });
   }
 
   _addTab() {
@@ -44,43 +81,17 @@ export default class App {
     }
   }
 
+  /**
+   * Returns the currently active {@link Tab}
+   */
   get activeTab(): Tab {
     return this._tabs[this._activeTabIndex];
   }
 
-  set stateMessage(stateMessage: string) {
-    this.activeTab._stateMessage = stateMessage;
-  }
-
-  get stateMessage(): string {
-    return this.activeTab.stateMessage;
-  }
-
-  get activeView(): ViewBase {
-    return this.activeTab.activeView;
-  }
-
-  get viewDepth() {
-    return this.activeTab.viewDepth;
-  }
-
-  get status() {
-    return this.activeTab.status;
-  }
-
-  setError(message: string) {
-    this.activeTab.setError(message);
-  }
-
-  setInfo(message: string) {
-    this.activeTab.setInfo(message);
-  }
-
-  setWarning(message: string) {
-    this.activeTab.setWarning(message);
-  }
-
-  render() {
+  /**
+   * Render the entire app
+   */
+  render(): void {
     try {
       output.clear();
       this._renderTitleBar();
@@ -95,7 +106,10 @@ export default class App {
   }
 
 
-  async handle(key: string) {
+  /**
+   * Handle user input for the entire app
+   */
+  async handle(key: string): Promise<void> {
     try {
       const handled = await this.activeTab.handle(key);
       if (!handled) {
@@ -174,19 +188,10 @@ export default class App {
     console.log(ui.toString());
   }
 
-  pushView(component: ViewBase) {
-    this.activeTab.pushView(component);
-  }
-
-  popView() {
-    this.activeTab.popView();
-  }
-
-  replaceView(component: ViewBase) {
-    this.activeTab.replaceView(component);
-  }
-
-  quit() {
+  /**
+   * Quit the entire app
+   */
+  quit(): void {
     output.clear();
     console.log('Bye!');
     process.exit(0);

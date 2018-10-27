@@ -8,6 +8,9 @@ import Input from '../component/Input';
 import { KEY_UP, KEY_DOWN } from '../keys';
 import Tab from '../Tab';
 
+/**
+ * Options for constructing an {@link InputView}
+ */
 export type InputViewOptions = {
   instructions?: string
 }
@@ -68,7 +71,7 @@ export default class InputView extends ViewBase {
   /**
    * Render the {@link InputView}
    */
-  render() {
+  render(): void {
     // Render instruction text somewhere below the input field but only if no input has been entered
     // since the input may wrap and overwrite this text otherwise
     if (!this._input.value && this._options.instructions) {
@@ -96,11 +99,11 @@ export default class InputView extends ViewBase {
     return history;
   }
 
-  set _history(history: InputViewHistory) {
+  set _history(history: InputViewHistory): void {
     allHistory.set(this._title, history);
   }
 
-  _addHistory(inputValue: string) {
+  _addHistory(inputValue: string): void {
     const history = this._history;
     const existingIndex = history.indexOf(inputValue);
     if (existingIndex > -1) {
@@ -110,21 +113,21 @@ export default class InputView extends ViewBase {
     this._history = history;
   }
 
-  async _onInputEnter(inputValue: string) {
+  async _onInputEnter(inputValue: string): Promise<void> {
     this._addHistory(inputValue);
     this._historyLevel = 0;
     this._input.value = '';
     await this._onEnter(inputValue);
   }
 
-  _loadEarlier() {
+  _loadEarlier(): void {
     if (this._historyLevel < this._history.length) {
       this._historyLevel++;
     }
     this._loadFromHistory();
   }
 
-  _loadLater() {
+  _loadLater(): void {
     if (this._historyLevel > 1) {
       this._historyLevel--;
       this._loadFromHistory();
@@ -134,7 +137,7 @@ export default class InputView extends ViewBase {
     }
   }
 
-  _loadFromHistory() {
+  _loadFromHistory(): void {
     if (!this._history.length) {
       this._tab.setWarning('No history found');
       return;

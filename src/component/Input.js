@@ -30,8 +30,8 @@ export default class Input extends ComponentBase {
   /**
    * The current value of the {@link Input}
    */
-  get value() { return this._value; }
-  set value(value: string) { this._value = value; }
+  get value(): string { return this._value; }
+  set value(value: string): void { this._value = value; }
 
   /**
    * Render the {@link Input} to the console
@@ -41,7 +41,7 @@ export default class Input extends ComponentBase {
     atColumn: number = 0,
     atRow: number = output.contentStartRow,
     allowWrap: boolean = true,
-  ) {
+  ): void {
     // Output value
     const promptColumnWidth = 2;
     const valueColumnWidth = output.width - atColumn - promptColumnWidth;
