@@ -1,19 +1,25 @@
 // @flow
 
-import Tab from './Tab';
+import Tab from '../Tab';
 import ComponentBase from './ComponentBase';
-import output from './output';
-import { KEY_ESCAPE, KEY_ENTER, KEY_BACKSPACE } from './keys';
+import output from '../output';
+import { KEY_ESCAPE, KEY_ENTER, KEY_BACKSPACE } from '../keys';
 
+/**
+ * The type of input that should be accepted or be represented by the {@link Input} component
+ */
 export type InputType = 'string' | 'integer' | 'password';
 
+/**
+ * A component for accepting user input
+ */
 export default class Input extends ComponentBase {
   _value: string
-  _onEnter: () => Promise<void>
+  _onEnter: (string) => Promise<void>
   _type: InputType
   _tab: Tab
 
-  constructor(tab: Tab, onEnter: () => Promise<void>, initialValue: string = '', type: InputType = 'string') {
+  constructor(tab: Tab, onEnter: (string) => Promise<void>, initialValue: string = '', type: InputType = 'string') {
     super();
     this._tab = tab;
     this._onEnter = onEnter;
@@ -21,15 +27,21 @@ export default class Input extends ComponentBase {
     this._type = type;
   }
 
-  get value() { return this._value; }
-  set value(value: string) { this._value = value; }
+  /**
+   * The current value of the {@link Input}
+   */
+  get value(): string { return this._value; }
+  set value(value: string): void { this._value = value; }
 
+  /**
+   * Render the {@link Input} to the console
+   */
   render(
     inactive: boolean = false,
     atColumn: number = 0,
     atRow: number = output.contentStartRow,
     allowWrap: boolean = true,
-  ) {
+  ): void {
     // Output value
     const promptColumnWidth = 2;
     const valueColumnWidth = output.width - atColumn - promptColumnWidth;
@@ -77,6 +89,9 @@ export default class Input extends ComponentBase {
     }
   }
 
+  /**
+   * Handle user input to the {@link Input} component
+   */
   async handle(key: string): Promise<boolean> {
     let handled = false;
     switch (key) {
@@ -85,7 +100,7 @@ export default class Input extends ComponentBase {
         handled = true;
         break;
       case KEY_ENTER:
-        await this._onEnter();
+        await this._onEnter(this._value);
         handled = true;
         break;
       case KEY_ESCAPE:

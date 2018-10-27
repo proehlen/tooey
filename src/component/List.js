@@ -4,21 +4,20 @@ import colors from 'colors';
 import { rightPad } from 'stringfu';
 
 
-import Tab from './Tab';
+import Tab from '../Tab';
 import ComponentBase from './ComponentBase';
 import Menu from './Menu';
-import MenuItem from './MenuItem';
-import output from './output';
+import output from '../output';
 
 import {
   KEY_PAGE_DOWN, KEY_PAGE_UP, KEY_DOWN, KEY_UP, KEY_ENTER,
-} from './keys';
+} from '../keys';
 
 /**
- * A column to be displayed in the list.  The value function
- * recieves a row in the data (an object) and the row index
- * and returns the value to be output as a string in that
- * column.
+ * A column to be displayed in a {@link List}.
+ *
+ * The value function recieves a row in the data (an object) and the row index
+ * and returns the value to be output as a string in that column.
  */
 export type ListColumn<T> = {
   heading: string,
@@ -29,25 +28,25 @@ export type ListColumn<T> = {
 type OutputRow = Array<string>
 
 /**
- * Data to display in the list - an array of objects.
+ * Data to display in a {@link List} - an array of objects.
  */
 export type ListData<T> = Array<T>
 
 /**
  * Callback function to be called when the user navigates to
- * a different row in the list (ie via up/down arrows).  Requires
- * List to be constructed with rowSelection === true.
+ * a different row in a {@link List} (ie via up/down arrows).  Requires
+ * List to be constructed with `rowSelection` set to `true`.
  */
 export type ListOnSelect = () => Promise<void>
 
 /**
  * Callback function to be called when the user presses Enter
- * on a list row.
+ * on a {@link List} row.
  */
 export type ListOnEnter = (number) => Promise<void>
 
 /**
- * List options
+ * {@link List} options
  */
 export type ListOptions = {
   showHeadings?: boolean,
@@ -56,7 +55,6 @@ export type ListOptions = {
   onSelect?: ListOnSelect,
   onEnter?: ListOnEnter,
 }
-
 
 /**
  * A multi-column List component with optional row selection
@@ -97,19 +95,31 @@ export default class List<T> extends ComponentBase {
       this._onEnter = options.onEnter;
     }
     if (options.menu) {
-      // Add paging to menu
-      options.menu.addItem(new MenuItem('D', 'Page Down', 'Go to next page', this.pageDown.bind(this)));
+      // Add page down to menu
+      options.menu.addItem({
+        key: 'D',
+        label: 'Page Down',
+        help: 'Go to next page',
+        execute: this._pageDown.bind(this),
+        visible: () => !this._isLastPage(),
+      });
     }
     if (options.menu) {
-      // Add paging to menu (incorrect flow error requires section if statement)
-      options.menu.addItem(new MenuItem('U', 'Page Up', 'Return to previous page', this.pageUp.bind(this)));
+      // Add page up to menu (incorrect flow error requires above additional if statement)
+      options.menu.addItem({
+        key: 'U',
+        label: 'Page Up',
+        help: 'Return to previous page',
+        execute: this._pageUp.bind(this),
+        visible: () => this._currentPage() > 1,
+      });
     }
   }
 
   /**
-   * Updates the data shown in the list
+   * Updates the data shown in a {@link List}
    */
-  setData(data: ListData<T>) {
+  setData(data: ListData<T>): void {
     this._data = data;
     this._startIndex = 0;
     this._selectedPageRow = 0;
@@ -125,9 +135,9 @@ export default class List<T> extends ComponentBase {
   }
 
   /**
-   * Renders this component
+   * Renders the {@link List}
    */
-  render() {
+  render(): void {
     // Column headings
     if (this._showHeadings) {
       output.cursorTo(0, output.contentStartRow - 1);
@@ -161,9 +171,10 @@ export default class List<T> extends ComponentBase {
   }
 
   /**
-   * Changes the currently displayed data to the previous page
+   * Changes the currently displayed data in a {@link List} to the previous page
+   * @private
    */
-  async pageUp(): Promise<void> {
+  async _pageUp(): Promise<void> {
     if (this._startIndex === 0) {
       this._tab.setInfo('Already at start');
       return;
@@ -180,7 +191,7 @@ export default class List<T> extends ComponentBase {
   }
 
   /**
-   * Return the index of the currently selected row
+   * Return the index of the currently selected row in a {@link List}
    */
   get selectedRowIndex(): number {
     return this._startIndex + this._selectedPageRow;
@@ -199,9 +210,10 @@ export default class List<T> extends ComponentBase {
   }
 
   /**
-   * Changes the currently displayed data to the next page
+   * Changes the currently displayed data in a {@link List} to the next page
+   * @private
    */
-  async pageDown(): Promise<void> {
+  async _pageDown(): Promise<void> {
     if ((this._startIndex + output.contentHeight) > this._data.length) {
       this._tab.setInfo('No more pages');
       return;
@@ -217,11 +229,12 @@ export default class List<T> extends ComponentBase {
   }
 
   /**
-   * Selects the previous record (pages up if necessary)
+   * Selects the previous record in a {@link List} (paging up if necessary)
+   * @private
    */
-  async selectPrevious(): Promise<void> {
+  async _selectPrevious(): Promise<void> {
     if (this._selectedPageRow === 0) {
-      await this.pageUp();
+      await this._pageUp();
     } else {
       this._selectedPageRow--;
     }
@@ -231,13 +244,14 @@ export default class List<T> extends ComponentBase {
   }
 
   /**
-   * Selects the next record (pages down if necessary)
+   * Selects the next record in a {@link List} (paging down if necessary)
+   * @private
    */
-  async selectNext(): Promise<void> {
+  async _selectNext(): Promise<void> {
     const isLastPage = this._isLastPage();
     const lastPageRowIndex = (this._data.length % output.contentHeight) - 1;
     if (!isLastPage && this._selectedPageRow >= output.contentHeight - 1) {
-      await this.pageDown();
+      await this._pageDown();
     } else if (isLastPage && this._selectedPageRow < lastPageRowIndex) {
       this._selectedPageRow++;
     } else if (!isLastPage) {
@@ -251,7 +265,7 @@ export default class List<T> extends ComponentBase {
   }
 
   /**
-   * Handle user input
+   * Handle user input to a {@link List}
    */
   async handle(key: string): Promise<boolean> {
     let handled = false;
@@ -264,26 +278,26 @@ export default class List<T> extends ComponentBase {
         break;
       case KEY_DOWN:
         if (this._rowSelection) {
-          await this.selectNext();
+          await this._selectNext();
         } else {
-          await this.pageDown();
+          await this._pageDown();
         }
         handled = true;
         break;
       case KEY_UP:
         if (this._rowSelection) {
-          await this.selectPrevious();
+          await this._selectPrevious();
         } else {
-          await this.pageUp();
+          await this._pageUp();
         }
         handled = true;
         break;
       case KEY_PAGE_DOWN:
-        await this.pageDown();
+        await this._pageDown();
         handled = true;
         break;
       case KEY_PAGE_UP:
-        await this.pageUp();
+        await this._pageUp();
         handled = true;
         break;
       default:

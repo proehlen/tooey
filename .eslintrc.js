@@ -20,5 +20,6 @@ module.exports = {
     'class-methods-use-this': 'off', // Allow "abstract" methods
     'no-debugger': process.env.NODE_ENV === 'production' ? 2 : 0,
     'no-console': 'off', // whole purpose of lib is writing to console
+    'prefer-destructuring': 'off', // I prefer it too but airbnb is broken and often gives other errors when its used ("unsupported destructuring pattern")
   }
 };
