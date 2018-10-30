@@ -3,16 +3,12 @@
   "version": "0.0.8",
   "description": "Framework for building Text UIs with Node.js",
   "homepage": "https://proehlen.github.io/tooey",
-  "main": "lib/index.js",
   "author": "Peter Roehlen",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/proehlen/tooey.git"
   },
-  "files": [
-    "lib"
-  ],
   "keywords": [
     "ui",
     "tui",
@@ -25,14 +21,17 @@
     "nodejs"
   ],
   "scripts": {
-    "build": "npm run eslint && npm run clean && npm run flowbuild && babel src -d lib",
+    "build": "npm run eslint && npm run clean && npm run flowbuild && babel src -d lib && npm run copy-package-files",
     "clean": "rimraf lib",
+    "copy-package-files": "node scripts/copyCleanPackageFiles.js",
     "docs": "docs2page",
     "eslint": "eslint src",
     "flow": "flow",
     "flowbuild": "flow-copy-source src lib",
     "prepare": "npm run build && npm run docs",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepublishOnly": "node prepublish.js",
+    "release": "RELEASE_MODE=true npm publish lib"
   },
   "dependencies": {
     "clear-console": "^1.1.0",
