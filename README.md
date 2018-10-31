@@ -1,4 +1,4 @@
-# Tooey - Build rich Text UIs with Node.js
+# Build rich Text UIs with Node.js
 
 Tooey (pronounced "too-ee") is a library and framework for creating rich [text-based user interfaces](https://en.wikipedia.org/wiki/Text-based_user_interface) in Node.js.
 

@@ -16,8 +16,8 @@ import {
 /**
  * A column to be displayed in a {@link List}.
  *
- * The value function recieves a row in the data (an object) and the row index
- * and returns the value to be output as a string in that column.
+ * The value function recieves a list row (an item / object of type T) and the
+ * row index and returns the value to be output as a string in that column.
  */
 export type ListColumn<T> = {
   heading: string,
@@ -28,9 +28,9 @@ export type ListColumn<T> = {
 type OutputRow = Array<string>
 
 /**
- * Data to display in a {@link List} - an array of objects.
+ * Items to display in a {@link List} - an array of objects of type T
  */
-export type ListData<T> = Array<T>
+export type ListItems<T> = Array<T>
 
 /**
  * Callback function to be called when the user navigates to
@@ -62,7 +62,7 @@ export type ListOptions = {
 export default class List<T> extends ComponentBase {
   _tab: Tab
   _startIndex: number
-  _data: ListData<T>
+  _items: ListItems<T>
   _columns: Array<ListColumn<T>>
   _showHeadings: boolean
   _rowSelection: boolean
@@ -76,13 +76,13 @@ export default class List<T> extends ComponentBase {
   constructor(
     tab: Tab,
     columns: Array<ListColumn<T>>,
-    data: ListData<T>,
+    items: ListItems<T>,
     options: ListOptions = {},
   ) {
     super();
     this._tab = tab;
     this._columns = columns;
-    this.setData(data);
+    this.items = items;
     this._showHeadings = options.showHeadings === undefined ? true : options.showHeadings;
     this._rowSelection = options.rowSelection === undefined ? false : options.rowSelection;
     if (options.onSelect) {
@@ -117,10 +117,14 @@ export default class List<T> extends ComponentBase {
   }
 
   /**
-   * Updates the data shown in a {@link List}
+   * Items shown in a {@link List}
    */
-  setData(data: ListData<T>): void {
-    this._data = data;
+  get items(): ListItems<T> {
+    return this._items;
+  }
+
+  set items(items: ListItems<T>): void {
+    this._items = items;
     this._startIndex = 0;
     this._selectedPageRow = 0;
   }
@@ -149,14 +153,14 @@ export default class List<T> extends ComponentBase {
       console.log(colors.bgBlue.white(heading));
     }
 
-    // Data for current page
+    // Render items for current page
     output.cursorTo(0, output.contentStartRow);
     const reduceColsToString = (accumulator, colData, index): string => {
       const column = this._columns[index];
       const colText = rightPad(colData, column.width);
       return `${accumulator || ''}${colText} `;
     };
-    this._data
+    this._items
       .slice(this._startIndex, this._startIndex + output.contentHeight)
       .map(this._getValues.bind(this))
       .map(cols => cols.reduce(reduceColsToString, ''))
@@ -171,7 +175,7 @@ export default class List<T> extends ComponentBase {
   }
 
   /**
-   * Changes the currently displayed data in a {@link List} to the previous page
+   * Changes the currently displayed items in a {@link List} to the previous page
    * @private
    */
   async _pageUp(): Promise<void> {
@@ -202,7 +206,7 @@ export default class List<T> extends ComponentBase {
   }
 
   _numberPages(): number {
-    return Math.floor(this._data.length / output.contentHeight) + 1;
+    return Math.floor(this._items.length / output.contentHeight) + 1;
   }
 
   _isLastPage(): boolean {
@@ -210,18 +214,18 @@ export default class List<T> extends ComponentBase {
   }
 
   /**
-   * Changes the currently displayed data in a {@link List} to the next page
+   * Changes the currently displayed items in a {@link List} to the next page
    * @private
    */
   async _pageDown(): Promise<void> {
-    if ((this._startIndex + output.contentHeight) > this._data.length) {
+    if ((this._startIndex + output.contentHeight) > this._items.length) {
       this._tab.setInfo('No more pages');
       return;
     }
     this._startIndex += output.contentHeight;
     this._selectedPageRow = 0;
-    if (this._startIndex >= (this._data.length)) {
-      this._startIndex = this._data.length - 1;
+    if (this._startIndex >= (this._items.length)) {
+      this._startIndex = this._items.length - 1;
     }
     if (this._onSelect) {
       await this._onSelect();
@@ -249,7 +253,7 @@ export default class List<T> extends ComponentBase {
    */
   async _selectNext(): Promise<void> {
     const isLastPage = this._isLastPage();
-    const lastPageRowIndex = (this._data.length % output.contentHeight) - 1;
+    const lastPageRowIndex = (this._items.length % output.contentHeight) - 1;
     if (!isLastPage && this._selectedPageRow >= output.contentHeight - 1) {
       await this._pageDown();
     } else if (isLastPage && this._selectedPageRow < lastPageRowIndex) {

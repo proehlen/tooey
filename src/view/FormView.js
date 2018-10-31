@@ -43,7 +43,9 @@ export default class FormView extends ComponentBase {
     );
 
     // Create menu
-    this._menu = new Menu(tab, menuItems, true, this._onNoMoreOptions.bind(this));
+    this._menu = new Menu(tab, menuItems, {
+      onBack: this._onNoMoreOptions.bind(this),
+    });
 
     // Start with menu active
     this._activeComponent = this._menu;

@@ -49,6 +49,17 @@ export type MenuItem = {
 }
 
 /**
+ * Options for constructing a {@link Menu}
+ *
+ * These are optional settings or values for constructing a Menu, not
+ * menu items - ie not the entries that the user sees.
+ */
+export type MenuOptions = {
+  hideBackItem?: boolean,
+  onNoMoreItems?: MenuOnNoMoreItems,
+}
+
+/**
  * A menu is a horizontal row of {@link MenuItem items} from which the user can choose
  */
 export default class Menu extends ComponentBase {
@@ -56,21 +67,18 @@ export default class Menu extends ComponentBase {
   _items: MenuItem[]
   _selectedItem: MenuItem
   _hasBack: boolean
-  _onNoMoreItems: MenuOnNoMoreItems
+  _onNoMoreItems: ?MenuOnNoMoreItems
 
   constructor(
     tab: Tab,
     items?: MenuItem[] = [],
-    allowBackItem: boolean = true,
-    onNoMoreItems?: MenuOnNoMoreItems,
+    options?: MenuOptions = {},
   ) {
     super();
 
     this._tab = tab;
     this._items = [];
-    if (onNoMoreItems) {
-      this._onNoMoreItems = onNoMoreItems;
-    }
+    this._onNoMoreItems = options.onNoMoreItems;
 
     // Every menu has to allow for quitting
     this.addItem({
@@ -80,7 +88,7 @@ export default class Menu extends ComponentBase {
     });
 
     // Most menus have (B)ack item
-    if (allowBackItem) {
+    if (!options.hideBackItem) {
       this.addItem({
         key: 'B',
         label: 'Back',
