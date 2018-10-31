@@ -1,6 +1,6 @@
 {
   "name": "tooey",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "Framework for building Text UIs with Node.js",
   "homepage": "https://proehlen.github.io/tooey",
   "author": "Peter Roehlen",
