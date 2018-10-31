@@ -30,7 +30,7 @@
     "flowbuild": "flow-copy-source src lib",
     "prepare": "npm run build && npm run docs",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "prepublishOnly": "node prepublish.js",
+    "prepublishOnly": "node scripts/prepublish.js",
     "release": "RELEASE_MODE=true npm publish lib"
   },
   "dependencies": {
